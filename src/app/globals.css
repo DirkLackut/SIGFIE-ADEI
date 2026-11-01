@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+/* Tipografías de ADEI (plan §14). Se sirven desde los paquetes, no desde Google:
+   el entorno de trabajo no llega a Google y así no se envía la IP de cada
+   usuario a un tercero (D16, D21).
+   · Montserrat: la interfaz (la del sitio de ADEI y la del «ADEI» de sus promocionales).
+   · Libre Baskerville: títulos. Versión libre (OFL) de la Baskerville del emblema. */
+@import "@fontsource/montserrat/400.css";
+@import "@fontsource/montserrat/500.css";
+@import "@fontsource/montserrat/600.css";
+@import "@fontsource/montserrat/700.css";
+@import "@fontsource/libre-baskerville/400.css";
+@import "@fontsource/libre-baskerville/700.css";
+
+@theme {
+  /* --- Paleta oficial del Manual de Identidad Corporativa de ADEI ---
+     Contrastes medidos (WCAG 2.2) en plan §14; tests/dominio/contraste.test.ts
+     los vuelve a medir. Cada color tiene UN uso, para que signifique algo. */
+  --color-marino: #03214c;        /* principal: encabezado, botón principal, franjas */
+  --color-marino-suave: #e8edf5;  /* encabezado de tabla, fila señalada, pestaña activa */
+  --color-azul: #3b5a9e;          /* Azul oscuro: enlaces, menú activo, foco */
+  --color-cian: #00545a;          /* Cian profundo: texto de éxito («Activo», «Listo») */
+  --color-cian-suave: #e5f2f1;
+  --color-verde: #05c167;         /* Verde: solo relleno o ícono de éxito, nunca texto */
+  --color-celeste: #3f95ff;       /* Celeste: detalles sobre fondo marino */
+  --color-dorado: #a57e14;        /* Dorado: bordes e íconos de advertencia */
+  --color-dorado-texto: #7a5a06;  /* tono oscuro del dorado: texto de advertencia y de errores */
+  --color-dorado-suave: #fbf5e4;
+
+  /* --- Texto y superficies --- */
+  --color-tinta: #212529;
+  --color-tinta-suave: #5c636a;   /* texto secundario */
+  --color-borde: #d6d9dc;
+  --color-papel: #ffffff;
+  --color-papel-alt: #f5f7fa;     /* fondo de la app y filas alternas */
+
+  /* --- Rojo del manual: reservado a las notas reprobadas ---
+     El formato impreso de ADEI dice "indicar en rojo las notas reprobadas".
+     No se usa para otra cosa, para que siga significando eso. */
+  --color-reprobado: #dd0e0e;
+
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-titulo: "Libre Baskerville", Baskerville, "Baskerville Old Face", Georgia, serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", monospace;
+
+  /* Movimiento (plan §14, criterio de Emil Kowalski): salida rápida, nunca ease-in. */
+  --ease-salida: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-mover: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Densidad: la usuaria principal domina Excel avanzado; se prioriza ver muchas
+     filas antes que el aire. */
+  --spacing-fila: 0.375rem;
+}
+
+/* Sin modo oscuro: el sistema reemplaza formatos impresos en blanco y se usa en
+   una PC de oficina. Un solo tema evita mantener dos paletas. */
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-papel);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem; /* 15px: cabe más información por pantalla */
+}
+
+/* Sin palabras sueltas en la última línea de un párrafo (detector de Impeccable). */
+p, li, dd { text-wrap: pretty; }
+h1, h2, h3 { text-wrap: balance; }
+
+/* Las cifras se leen en columna: todas con el mismo ancho para que alineen. */
+.cifra {
+  font-variant-numeric: tabular-nums;
+}
+
+/* =============================================================================
+   Componentes base (T19). Pocas clases, siempre las mismas, para que cada
+   pantalla se lea igual: etiqueta arriba, ayuda debajo, error en dorado.
+   El error de un formulario NO va en rojo: el rojo es de las notas reprobadas
+   (constitución, principio 9). Se distingue por el borde, el icono y el texto.
+   ============================================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--color-azul);
+  outline-offset: 2px;
+}
+
+.campo-entrada {
+  display: block;
+  width: 100%;
+  min-height: 2.5rem; /* 40px: cómodo para el dedo en el celular del profesor */
+  border: 1px solid var(--color-borde);
+  border-radius: 0.375rem;
+  background: var(--color-papel);
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: var(--color-tinta);
+}
+.campo-entrada::placeholder { color: var(--color-tinta-suave); opacity: 1; } /* 5.7:1, no el gris claro del navegador */
+.campo-entrada:hover { border-color: var(--color-tinta-suave); }
+.campo-entrada:focus-visible { outline-offset: 0; border-color: var(--color-azul); }
+.campo-entrada[aria-invalid="true"] {
+  border-color: var(--color-dorado);
+  background: var(--color-dorado-suave);
+}
+.campo-entrada:disabled { background: var(--color-papel-alt); color: var(--color-tinta-suave); }
+
+/* Tabla densa: la Asistente lee como en Excel. */
+.tabla { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.tabla th {
+  position: sticky; top: 0;
+  background: var(--color-marino-suave);
+  text-align: left; font-weight: 600;
+  padding: var(--spacing-fila) 0.625rem;
+  border-bottom: 2px solid var(--color-marino);
+  white-space: nowrap;
+}
+.tabla td {
+  padding: var(--spacing-fila) 0.625rem;
+  border-bottom: 1px solid var(--color-borde);
+  vertical-align: top;
+}
+.tabla tbody tr:nth-child(even) td { background: var(--color-papel-alt); }
+.tabla tbody tr:hover td { background: var(--color-marino-suave); }
+
+/* =============================================================================
+   Lo que queda fijo al desplazarse (plan §14). Fondo sólido, no transparente:
+   en una pantalla de datos el texto que pasa por detrás de una barra
+   semitransparente le quita contraste a la barra y distrae.
+   · PC: encabezado (64 px) y menú quedan arriba.
+   · Celular: solo el menú; el encabezado se va al bajar.
+   · Al bajar, el menú toma una sombra leve: dice que hay contenido debajo.
+   ============================================================================= */
+.menu-fijo { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
+@media (min-width: 640px) {
+  .encabezado-fijo { position: sticky; top: 0; z-index: 30; }
+  .menu-fijo { top: 4rem; }
+}
+/* Sombra según el desplazamiento, sin JavaScript (el navegador la calcula). Donde
+   no hay soporte, simplemente no aparece. */
+@supports (animation-timeline: scroll()) {
+  .menu-fijo {
+    animation: sombra-al-bajar linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 24px;
+  }
+  @keyframes sombra-al-bajar { to { box-shadow: 0 8px 16px -12px rgb(3 33 76 / 0.45); } }
+}
+/* Al saltar a un ancla (por ejemplo «Ir al contenido»), que no quede debajo de lo fijo. */
+html { scroll-padding-top: 3.5rem; }
+@media (min-width: 640px) { html { scroll-padding-top: 7.5rem; } }
+
+/* Botones de formularios largos fijos abajo en el celular (BarraAcciones). */
+@media (max-width: 639px) {
+  .barra-acciones {
+    position: sticky; bottom: 0; z-index: 10;
+    margin-inline: -1rem;
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    background: var(--color-papel);
+    border-top: 1px solid var(--color-borde);
+  }
+  .barra-acciones > * { flex: 1 1 0; }
+}
+
+/* =============================================================================
+   Celular (skill mobile-native). Lo que separa "una página en el navegador" de
+   algo que se siente como app.
+   ============================================================================= */
+
+/* El iPhone hace zoom al tocar un campo con letra menor a 16 px. */
+@media (max-width: 640px) {
+  .campo-entrada { font-size: 16px; }
+}
+html {
+  -webkit-tap-highlight-color: transparent; /* sin destello gris al tocar */
+  text-size-adjust: 100%;
+}
+/* Un hover que se queda "pegado" después de tocar confunde: solo con mouse. */
+@media (hover: none) {
+  .tabla tbody tr:hover td { background: inherit; }
+}
+button, summary, a { touch-action: manipulation; } /* toque sin espera de doble toque */
+
+/* =============================================================================
+   Movimiento (plan §14). Respuesta al toque en todos los botones; lo demás lo
+   maneja motion (componentes/movimiento.tsx). Nada pasa de 300 ms.
+   ============================================================================= */
+.boton {
+  transition: transform 120ms var(--ease-salida), background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.boton:active:not(:disabled) { transform: scale(0.97); }
+
+/* Paneles que se despliegan (details): el contenido entra desde arriba, corto. */
+details[open] > .desplegable {
+  animation: desplegar 200ms var(--ease-salida);
+}
+@keyframes desplegar {
+  from { opacity: 0; transform: translateY(-4px); }
+}
+/* El menú «Cuenta» nace de su botón, no del centro. */
+details[open] > .menu-flotante {
+  transform-origin: top right;
+  animation: abrir-menu 160ms var(--ease-salida);
+}
+@keyframes abrir-menu {
+  from { opacity: 0; transform: scale(0.96); }
+}
+
+/* Avisos y confirmaciones que aparecen por una acción: entrada corta de 8 px. */
+.aparecer { animation: aparecer 200ms var(--ease-salida); }
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+/* «Reducir movimiento» del sistema: sin animaciones. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
