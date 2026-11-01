@@ -11,7 +11,7 @@ export function FormularioAviso({ version }: { version: string }) {
       {estado.mensaje && <Alerta tipo="cuidado" titulo="No se registró">{estado.mensaje}</Alerta>}
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         {/* No aceptar = salir: sin aceptar no hay acceso (CE-15). */}
-        <form action="/salir" method="post">
+        <form action="/salir?motivo=aviso" method="post">
           <button className={claseBoton("secundario") + " w-full sm:w-auto"}>No acepto, salir</button>
         </form>
         <form action={accion}>

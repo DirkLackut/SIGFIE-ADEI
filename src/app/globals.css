@@ -105,6 +105,9 @@ h1, h2, h3 { text-wrap: balance; }
   background: var(--color-dorado-suave);
 }
 .campo-entrada:disabled { background: var(--color-papel-alt); color: var(--color-tinta-suave); }
+/* Datos traídos del sistema que no se editan aquí (por ejemplo, el tutor ya
+   registrado): se ven distintos de un campo para escribir. */
+.campo-entrada[readonly] { background: var(--color-papel-alt); border-style: dashed; cursor: default; }
 
 /* Tabla densa: la Asistente lee como en Excel. */
 .tabla { width: 100%; border-collapse: collapse; font-size: 0.875rem; }

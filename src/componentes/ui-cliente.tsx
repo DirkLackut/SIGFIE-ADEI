@@ -1,6 +1,6 @@
 "use client";
 /** Piezas que necesitan el navegador: estado de envío y mostrar contraseña. */
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import { claseBoton, type EstiloBoton, type TamanoBoton } from "./ui";
 
@@ -38,6 +38,28 @@ export function BotonConfirmar({ children, pregunta, confirmar, enviando = "…"
 function BotonConfirmarEnvio({ clase, enviando, children }: { clase: string; enviando: string; children: ReactNode }) {
   const { pending } = useFormStatus();
   return <button type="submit" disabled={pending} className={clase}>{pending ? enviando : children}</button>;
+}
+
+/**
+ * Avisos de error que se van cuando la persona corrige el campo. El servidor
+ * devuelve los errores del último envío; sin esto, «Debe tener 8 dígitos» seguía
+ * debajo de un teléfono ya corregido hasta volver a enviar, y parecía que el
+ * sistema no aceptaba el dato. Con cada respuesta nueva del servidor, los avisos
+ * vuelven a ser los que él diga.
+ */
+export function useErroresVivos(errores: Record<string, string> | undefined, respuesta: object) {
+  const [editados, setEditados] = useState<ReadonlySet<string>>(new Set());
+  const [ultima, setUltima] = useState(respuesta);
+  if (respuesta !== ultima) { setUltima(respuesta); setEditados(new Set()); }
+  const e = useMemo(
+    () => Object.fromEntries(Object.entries(errores ?? {}).filter(([campo]) => !editados.has(campo))) as Record<string, string>,
+    [errores, editados]);
+  const marcar = (...campos: string[]) => setEditados((s) => new Set([...s, ...campos]));
+  const alEscribir = (ev: React.FormEvent<HTMLFormElement>) => {
+    const campo = (ev.target as HTMLInputElement).name;
+    if (campo && e[campo]) marcar(campo);
+  };
+  return { e, alEscribir, marcar };
 }
 
 /** React 19 vacía el formulario al terminar cada acción, y con eso se pierden las

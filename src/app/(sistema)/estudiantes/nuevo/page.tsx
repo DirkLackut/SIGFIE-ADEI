@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { opcionSucursal } from "@/dominio/formato";
 import { exigirAcceso } from "@/servidor/sesion";
 import { clienteSesion } from "@/servidor/supabase";
 import { TituloPagina } from "@/componentes/ui";
@@ -15,7 +16,7 @@ export default async function PaginaNuevoEstudiante() {
       <TituloPagina titulo="Registrar estudiante" volver={{ href: "/estudiantes", texto: "Estudiantes" }}
         descripcion="El sistema le asigna el código ADEI y revisa que no esté registrado ya. Los campos con * son obligatorios." />
       <div className="max-w-4xl">
-        <FormularioEstudiante sucursales={(data ?? []).map((s) => ({ valor: s.id, texto: s.es_central ? `${s.nombre} (central)` : s.nombre }))} />
+        <FormularioEstudiante sucursales={(data ?? []).map(opcionSucursal)} />
       </div>
     </>
   );

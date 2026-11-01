@@ -325,13 +325,21 @@ documenta y pone a prueba lo construido. Si una prueba encuentra algo que exige
 cambiar el sistema (por ejemplo, cabeceras de seguridad), el cambio entra primero
 en la spec, como cualquier otro.
 
-- [ ] **T31 · PC · [demo]** Historial de commits. Un commit por bloque, con
+- [x] **T31 · PC · [demo]** Historial de commits. Un commit por bloque, con
   Conventional Commits (`docs:`, `feat(bd):`, `feat(app):`, `chore:`…), y primer
   push a `DirkLackut/SIGFIE-ADEI`.
   - Hecho cuando: `git log` cuenta la historia del proyecto en orden (constitución,
     spec, bloques 0 a 3); antes de cada commit se verificó que no entra ningún
     `.env*`, `.xlsx` o `.csv` ni ninguna clave; el repositorio público abre en
     GitHub con el README.
+  - **Hecho el 2026-10-31** con Claude Code en la PC: 9 commits en `main`, del
+    «Initial commit» a `feat(marca)`. Antes del push se verificó que no entrara
+    ningún secreto, `.env*`, `.xlsx` ni `.csv`, que las 25 cédulas de las pruebas no
+    coincidieran con las de los Excel (0 coincidencias), y se corrieron las pruebas
+    (462 en verde), `tsc` y `npm audit --omit=dev` (0). Los commits usan el correo
+    privado de GitHub (`…@users.noreply.github.com`): el historial se reescribió
+    una vez, el mismo día, antes de conectar Vercel, para no publicar el correo
+    institucional.
 
 - [ ] **T32 · Aquí · [demo]** Guía de uso en el README, desde cero: qué es el
   sistema; cómo recibe cada persona su usuario y su contraseña temporal; primer
@@ -374,3 +382,5 @@ en la spec, como cualquier otro.
 
 Los 100 CE de la spec aparecen en al menos una tarea (comprobado con un script el
 2026-10-29; el CE-12 faltaba y se agregó a T16).
+
+> **2026-11-01, prueba manual 12:** el campo de fecha dejaba teclear años de seis cifras y el servidor los aceptaba. Se añadió CE-50a a la spec, `src/dominio/fechas-grupo.ts` con sus pruebas, límites `min`/`max` en los campos de fecha, y la marca «✓ Ya inscrito» en la búsqueda para inscribir.

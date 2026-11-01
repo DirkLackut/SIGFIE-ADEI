@@ -8,7 +8,9 @@ import { clienteSesion } from "@/servidor/supabase";
 async function salir(request: NextRequest) {
   const supabase = await clienteSesion();
   await supabase.auth.signOut();
-  const motivo = request.nextUrl.searchParams.get("motivo") === "cuenta" ? "cuenta" : "salio";
+  // Solo motivos conocidos: lo que venga en la dirección no se refleja en la página.
+  const pedido = request.nextUrl.searchParams.get("motivo");
+  const motivo = pedido === "cuenta" || pedido === "aviso" ? pedido : "salio";
   // Location relativa: el navegador vuelve al mismo dominio por el que entró
   // (con request.url, `next start` en 127.0.0.1 mandaba a localhost).
   return new NextResponse(null, { status: 303, headers: { Location: `/ingresar?motivo=${motivo}` } });

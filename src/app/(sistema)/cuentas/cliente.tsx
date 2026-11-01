@@ -2,7 +2,7 @@
 import { useActionState, useState } from "react";
 import { accionCrearCuenta, accionRestablecer, accionEstado, accionRoles, type EstadoCuenta } from "./acciones";
 import { Campo, Selector } from "@/componentes/campos";
-import { BotonConfirmar, BotonEnviar, conservarSiFalla } from "@/componentes/ui-cliente";
+import { BotonConfirmar, BotonEnviar, conservarSiFalla, useErroresVivos } from "@/componentes/ui-cliente";
 import { Aparecer, Desplegable, useConfirmarExito } from "@/componentes/movimiento";
 import { Alerta, claseBoton } from "@/componentes/ui";
 import type { Rol } from "@/dominio/acceso";
@@ -58,6 +58,7 @@ export function NuevaCuenta({ profesoresSinCuenta }: { profesoresSinCuenta: Op[]
   const [s, accion] = useActionState<EstadoCuenta, FormData>(accionCrearCuenta, {});
   const [roles, setRoles] = useState<Rol[]>([]);
   const [clave, setClave] = useState(0);
+  const { e, alEscribir } = useErroresVivos(s.errores, s);
   if (s.ok && s.temporal) {
     return (
       <div className="space-y-3">
@@ -66,9 +67,9 @@ export function NuevaCuenta({ profesoresSinCuenta }: { profesoresSinCuenta: Op[]
       </div>
     );
   }
-  const e = s.errores ?? {}; const v = (s.valores ?? {}) as Record<string, string>;
+  const v = (s.valores ?? {}) as Record<string, string>;
   return (
-    <form key={clave} action={accion} onReset={conservarSiFalla()} className="space-y-4" noValidate>
+    <form key={clave} action={accion} onReset={conservarSiFalla()} onInput={alEscribir} className="space-y-4" noValidate>
       {s.mensaje && <Alerta tipo="cuidado" titulo="No se creó la cuenta">{s.mensaje}</Alerta>}
       <div className="grid gap-4 sm:grid-cols-2">
         <Campo nombre="nombre_usuario" etiqueta="Nombre de usuario" requerido defaultValue={v.nombre_usuario} error={e.nombre_usuario}

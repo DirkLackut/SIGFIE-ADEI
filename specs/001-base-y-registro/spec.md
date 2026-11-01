@@ -150,6 +150,7 @@ marcados **Retro** responden al plan de mejora del docente.
 - **CE-48** · *CU-09, P8* — CUANDO se abre un grupo, EL SISTEMA le asignará un código único con formato `G-AAAA-NNNN`, cuyo correlativo reinicia cada año, y dejará su acta en estado Abierta.
 - **CE-49** · *RN-07* — SI el horario elegido no pertenece a la modalidad elegida, ENTONCES EL SISTEMA rechazará el grupo.
 - **CE-50** · *RN-08* — SI la fecha de término no es posterior a la de inicio, ENTONCES EL SISTEMA rechazará el grupo.
+- **CE-50a** · *RN-08, prueba manual 12* — SI una fecha del grupo no existe o su año no tiene cuatro cifras, si la fecha de inicio queda a más de un año de hoy (antes o después), o si la de término queda a más de un año de la de inicio, ENTONCES EL SISTEMA rechazará el grupo indicando la regla. *(Añadido el 2026-11-01: el campo de fecha del navegador dejaba teclear años de seis cifras, como «602026».)*
 - **CE-51** · *P6, L5* — MIENTRAS el acta del grupo esté Abierta, EL SISTEMA permitirá a la Asistente cambiar el profesor asignado por otro profesor activo, exigiendo un motivo.
 - **CE-52** · *P6, RN-10* — CUANDO se cambia el profesor de un grupo, EL SISTEMA retirará de inmediato al profesor anterior el acceso a ese grupo.
 - **CE-53** · *P6, RN-11* — SI el acta del grupo está Entregada, ENTONCES EL SISTEMA no permitirá cambiar su profesor.

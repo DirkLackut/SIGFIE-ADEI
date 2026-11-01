@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { hoyEnManagua, calcularEdad, esMenorDeEdad, validarFechaNacimiento } from "@/dominio/edad";
+import { hoyEnManagua, calcularEdad, esMenorDeEdad, validarFechaNacimiento, edadMientrasSeEscribe } from "@/dominio/edad";
 
 describe("hoyEnManagua — la fecha del día es la de Nicaragua (CE-77)", () => {
   test("CE-77 · a las 21:30 en Managua sigue siendo el mismo día, aunque en UTC ya sea mañana", () => {
@@ -54,5 +54,22 @@ describe("validarFechaNacimiento (CE-36)", () => {
     ["29/10/2000", "La fecha no existe."],
   ])("CE-36 · rechaza %s", (f, regla) => {
     expect(validarFechaNacimiento(f, hoy)).toEqual({ ok: false, regla });
+  });
+});
+
+describe("edad mientras se escribe la fecha (error de la prueba manual 7)", () => {
+  const hoy = "2026-11-01";
+  test("los años de 1 a 99 no se confunden con 1901–1999", () => {
+    expect(validarFechaNacimiento("0002-05-20", hoy)).toMatchObject({ ok: false });
+    expect(validarFechaNacimiento("0002-05-20", hoy)).toMatchObject({ regla: "La edad debe estar entre 4 y 99 años." });
+  });
+  test("lo que pasa por el campo mientras se teclea el año nunca rompe la pantalla", () => {
+    for (const f of ["0002-05-20", "0020-05-20", "0201-05-20", "2014-05-20", "", "2014-02-30", "9999-01-01"]) {
+      expect(() => edadMientrasSeEscribe(f, hoy)).not.toThrow();
+    }
+    expect(edadMientrasSeEscribe("0002-05-20", hoy)).toBeNull();
+    expect(edadMientrasSeEscribe("0201-05-20", hoy)).toBeNull();
+    expect(edadMientrasSeEscribe("2014-05-20", hoy)).toBe(12);
+    expect(edadMientrasSeEscribe("2030-01-01", hoy)).toBeNull();
   });
 });

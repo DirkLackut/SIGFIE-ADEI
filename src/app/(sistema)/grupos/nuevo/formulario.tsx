@@ -3,9 +3,11 @@ import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionAbrirGrupo, type EstadoNuevoGrupo } from "./acciones";
 import { Campo, Selector } from "@/componentes/campos";
-import { BotonEnviar, conservarSiFalla } from "@/componentes/ui-cliente";
+import { BotonEnviar, conservarSiFalla, useErroresVivos } from "@/componentes/ui-cliente";
 import { Alerta, BarraAcciones, claseBoton } from "@/componentes/ui";
 import { hora } from "@/dominio/formato";
+import { hoyEnManagua } from "@/dominio/edad";
+import { limitesFechasGrupo } from "@/dominio/fechas-grupo";
 
 type Op = { valor: string; texto: string };
 export interface Catalogo {
@@ -17,13 +19,14 @@ export interface Catalogo {
 /** Abrir grupo. Al elegir la modalidad solo se ofrecen SUS horarios (CE-49). */
 export function FormularioGrupo({ cat }: { cat: Catalogo }) {
   const [s, accion] = useActionState<EstadoNuevoGrupo, FormData>(accionAbrirGrupo, {});
-  const v = s.valores ?? {}; const e = s.errores ?? {};
+  const v = s.valores ?? {}; const { e, alEscribir } = useErroresVivos(s.errores, s);
   const [modalidad, setModalidad] = useState(v.modalidad_id ?? "");
   const mod = cat.modalidades.find((m) => m.id === modalidad);
+  const limites = limitesFechasGrupo(hoyEnManagua(new Date()));
   const programas = [...new Set(cat.niveles.map((n) => n.programa))];
 
   return (
-    <form action={accion} onReset={conservarSiFalla()} className="space-y-5" noValidate>
+    <form action={accion} onReset={conservarSiFalla()} onInput={alEscribir} className="space-y-5" noValidate>
       {s.mensaje && <Alerta tipo="cuidado" titulo="No se abrió el grupo">{s.mensaje}</Alerta>}
       <fieldset className="grid gap-4 rounded-lg border border-borde bg-papel p-4 sm:grid-cols-2">
         <legend className="px-1 text-sm font-semibold">Qué y quién</legend>
@@ -54,9 +57,11 @@ export function FormularioGrupo({ cat }: { cat: Catalogo }) {
                   disabled={!mod} vacio={mod ? "Seleccione…" : "Primero elija la modalidad"}
                   opciones={(mod?.horarios ?? []).map((h) => ({ valor: h.id, texto: `${hora(h.hora_inicio)} a ${hora(h.hora_fin)}` }))} />
         <Campo nombre="fecha_inicio" etiqueta="Fecha de inicio" requerido type="date" defaultValue={v.fecha_inicio} error={e.fecha_inicio}
-               ayuda="Puede ser anterior a hoy si el grupo ya empezó." />
+               min={limites.inicio.min} max={limites.inicio.max}
+               ayuda="Puede ser anterior a hoy si el grupo ya empezó, hasta un año atrás." />
         <Campo nombre="fecha_termino" etiqueta="Fecha de término" requerido type="date" defaultValue={v.fecha_termino} error={e.fecha_termino}
-               ayuda="Debe ser posterior al inicio y no haber pasado." />
+               min={limites.termino.min} max={limites.termino.max}
+               ayuda="Posterior al inicio, sin haber pasado, y a no más de un año del inicio." />
       </fieldset>
 
       <BarraAcciones>

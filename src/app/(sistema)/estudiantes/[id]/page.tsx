@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { exigirAcceso } from "@/servidor/sesion";
 import { clienteSesion } from "@/servidor/supabase";
 import { Alerta, BotonEnlace, Dato, Insignia, Seccion, Tabla, TituloPagina } from "@/componentes/ui";
-import { esUuid, fecha, telefono } from "@/dominio/formato";
+import { esUuid, fecha, telefono, opcionSucursal } from "@/dominio/formato";
 import { calcularEdad, hoyEnManagua } from "@/dominio/edad";
 import { FormularioEdicion, QuitarTutor, VincularTutor } from "./formularios";
 import { Desplegable } from "@/componentes/movimiento";
@@ -29,7 +29,7 @@ export default async function PaginaExpediente({ params, searchParams }: PagePro
   const supabase = await clienteSesion();
   const [{ data: est }, { data: sucursales }, { data: tutores }, { data: inscripciones }] = await Promise.all([
     supabase.from("estudiante").select("*").eq("id", id).maybeSingle(),
-    supabase.from("sucursal").select("id, nombre").order("nombre"),
+    supabase.from("sucursal").select("id, nombre, es_central").order("es_central", { ascending: false }).order("nombre"),
     supabase.from("estudiante_tutor").select("tutor_id, tutor(id, nombre_completo, cedula, telefono)").eq("estudiante_id", id),
     supabase.from("inscripcion").select("id, fecha_inscripcion, estado_inscripcion, grupo(id, codigo_grupo, fecha_inicio, fecha_termino, estado_acta, nivel(nombre))")
       .eq("estudiante_id", id).order("fecha_inscripcion", { ascending: false }),
@@ -66,7 +66,7 @@ export default async function PaginaExpediente({ params, searchParams }: PagePro
         </dl>
         {puedeEditar && (
           <div className="mt-5"><Desplegable titulo="Editar datos">
-              <FormularioEdicion est={est} sucursales={(sucursales ?? []).map((s) => ({ valor: s.id, texto: s.nombre }))} />
+              <FormularioEdicion est={est} sucursales={(sucursales ?? []).map(opcionSucursal)} />
             </Desplegable></div>
         )}
       </Seccion>

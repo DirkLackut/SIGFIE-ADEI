@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { opcionSucursal } from "@/dominio/formato";
 import { exigirAcceso } from "@/servidor/sesion";
 import { clienteSesion } from "@/servidor/supabase";
 import { Alerta, BotonEnlace, TituloPagina } from "@/componentes/ui";
@@ -14,7 +15,7 @@ export default async function PaginaNuevoGrupo() {
     s.from("nivel").select("id, nombre, programa, orden").eq("activo", true).order("programa").order("orden"),
     s.from("modalidad").select("id, nombre, dias_de_clase, horario(id, hora_inicio, hora_fin, activo)").eq("activo", true).order("nombre"),
     s.from("profesor").select("id, nombres, apellidos").eq("activo", true).order("apellidos"),
-    s.from("sucursal").select("id, nombre").order("nombre"),
+    s.from("sucursal").select("id, nombre, es_central").order("es_central", { ascending: false }).order("nombre"),
   ]);
   const cat: Catalogo = {
     niveles: niveles.data ?? [],
@@ -22,7 +23,7 @@ export default async function PaginaNuevoGrupo() {
       horarios: ((m.horario ?? []) as { id: string; hora_inicio: string; hora_fin: string; activo: boolean }[])
         .filter((h) => h.activo).sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio)) })),
     profesores: (profesores.data ?? []).map((p) => ({ valor: p.id, texto: `${p.apellidos}, ${p.nombres}` })),
-    sucursales: (sucursales.data ?? []).map((x) => ({ valor: x.id, texto: x.nombre })),
+    sucursales: (sucursales.data ?? []).map(opcionSucursal),
   };
   return (
     <>

@@ -2,7 +2,7 @@
 import { useActionState } from "react";
 import { accionGuardarCatalogo, accionCambiarCatalogo, type EstadoCatalogo } from "./acciones";
 import { Campo, Selector } from "@/componentes/campos";
-import { BotonConfirmar, BotonEnviar } from "@/componentes/ui-cliente";
+import { BotonConfirmar, BotonEnviar, useErroresVivos } from "@/componentes/ui-cliente";
 import { Alerta } from "@/componentes/ui";
 import { useConfirmarExito } from "@/componentes/movimiento";
 import type { Entidad } from "@/dominio/catalogos";
@@ -19,10 +19,10 @@ export function FormularioCatalogo({ entidad, campos, id, valores = {}, boton, f
 }) {
   const [s, accion] = useActionState<EstadoCatalogo, FormData>(accionGuardarCatalogo, {});
   const v = { ...valores, ...(s.ok ? {} : s.valores ?? {}) };
-  const e = s.errores ?? {};
+  const { e, alEscribir } = useErroresVivos(s.errores, s);
   useConfirmarExito(s, !!s.ok, s.mensaje);
   return (
-    <form action={accion} className="space-y-3" noValidate key={s.marca ?? 0}>
+    <form action={accion} onInput={alEscribir} className="space-y-3" noValidate key={s.marca ?? 0}>
       <input type="hidden" name="entidad" value={entidad} />
       {id && <input type="hidden" name="id" value={id} />}
       {Object.entries(fijos).map(([k, x]) => <input key={k} type="hidden" name={k} value={x} />)}

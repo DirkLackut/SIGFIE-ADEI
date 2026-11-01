@@ -32,6 +32,11 @@ export default async function PaginaIngreso({ searchParams }: PageProps<"/ingres
           <p className="mt-1 mb-6 text-sm text-tinta-suave">Use el usuario y la contraseña que le entregó la Asistente de Dirección.</p>
           {motivo === "cuenta" && <div className="mb-4"><Alerta tipo="cuidado">Su sesión se cerró. Si cree que es un error, consulte a la Asistente de Dirección.</Alerta></div>}
           {motivo === "salio" && <div className="mb-4"><Alerta tipo="info">Salió del sistema.</Alerta></div>}
+          {motivo === "aviso" && (
+            <div className="mb-4"><Alerta tipo="info" titulo="No aceptó el aviso de privacidad">
+              Para usar el sistema hay que aceptarlo. Puede volver a ingresar cuando quiera.
+            </Alerta></div>
+          )}
           <FormularioIngreso />
           <div className="mt-8 space-y-2 border-t border-borde pt-4 text-xs text-tinta-suave">
             <p><strong className="text-tinta">¿Olvidó su contraseña?</strong> Pida a la Asistente de Dirección que la restablezca: le entregará una contraseña temporal.</p>

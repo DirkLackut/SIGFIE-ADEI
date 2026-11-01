@@ -4,22 +4,22 @@ import Link from "next/link";
 import type { Route } from "next";
 import { accionRegistrar, accionCompletarCedula, buscarTutor, type EstadoRegistro } from "./acciones";
 import { Campo, Selector } from "@/componentes/campos";
-import { BotonEnviar, conservarSiFalla } from "@/componentes/ui-cliente";
+import { BotonEnviar, conservarSiFalla, useErroresVivos } from "@/componentes/ui-cliente";
 import { Alerta, BarraAcciones, claseBoton } from "@/componentes/ui";
-import { calcularEdad, hoyEnManagua } from "@/dominio/edad";
-import { fecha } from "@/dominio/formato";
+import { edadMientrasSeEscribe, hoyEnManagua } from "@/dominio/edad";
+import { fecha, telefono as formatoTelefono } from "@/dominio/formato";
 
 export function FormularioEstudiante({ sucursales }: { sucursales: { valor: string; texto: string }[] }) {
   const [estado, accion] = useActionState<EstadoRegistro, FormData>(accionRegistrar, {});
   const v = estado.valores ?? {};
-  const e = estado.errores ?? {};
+  const { e, alEscribir, marcar } = useErroresVivos(estado.errores, estado);
   const [nacimiento, setNacimiento] = useState(v.fecha_nacimiento ?? "");
   const hoy = hoyEnManagua(new Date());
-  const edad = /^\d{4}-\d{2}-\d{2}$/.test(nacimiento) && nacimiento <= hoy ? calcularEdad(nacimiento, hoy) : null;
+  const edad = edadMientrasSeEscribe(nacimiento, hoy);
   const menor = edad !== null && edad < 18;
 
   return (
-    <form action={accion} onReset={conservarSiFalla()} className="space-y-6" noValidate>
+    <form action={accion} onReset={conservarSiFalla()} onInput={alEscribir} className="space-y-6" noValidate>
       {estado.mensaje && <Alerta tipo="cuidado" titulo="No se registró">{estado.mensaje}</Alerta>}
       {Object.keys(e).length > 0 && !estado.existente && (
         <Alerta tipo="cuidado" titulo="Revise los campos marcados">Lo que ya escribió se conserva.</Alerta>
@@ -77,7 +77,7 @@ export function FormularioEstudiante({ sucursales }: { sucursales: { valor: stri
         <Selector nombre="sucursal_id" etiqueta="Sucursal" requerido opciones={sucursales} defaultValue={v.sucursal_id} error={e.sucursal_id} />
       </fieldset>
 
-      {menor && <BloqueTutor v={v} e={e} />}
+      {menor && <BloqueTutor v={v} e={e} marcar={marcar} />}
 
       <BarraAcciones>
         <BotonEnviar enviando="Registrando…">Registrar estudiante</BotonEnviar>
@@ -104,7 +104,7 @@ export function FormularioEstudiante({ sucursales }: { sucursales: { valor: stri
 }
 
 /** Tutor de un menor (CE-33). Si la cédula ya existe, trae sus datos (CE-38). */
-function BloqueTutor({ v, e }: { v: EstadoRegistro["valores"] & object; e: Record<string, string> }) {
+function BloqueTutor({ v, e, marcar }: { v: EstadoRegistro["valores"] & object; e: Record<string, string>; marcar: (...campos: string[]) => void }) {
   const [cedula, setCedula] = useState(v.tutor_cedula ?? "");
   const [nombre, setNombre] = useState(v.tutor_nombre ?? "");
   const [telefono, setTelefono] = useState(v.tutor_telefono ?? "");
@@ -113,7 +113,8 @@ function BloqueTutor({ v, e }: { v: EstadoRegistro["valores"] & object; e: Recor
   async function buscar() {
     const t = await buscarTutor(cedula);
     setEncontrado(!!t);
-    if (t) { setNombre(t.nombre_completo); setTelefono(t.telefono); }
+    // Los datos llegan sin que se escriba en los campos: se quitan sus avisos a mano.
+    if (t) { setNombre(t.nombre_completo); setTelefono(formatoTelefono(t.telefono) ?? ""); marcar("tutor_nombre", "tutor_telefono"); }
   }
 
   return (

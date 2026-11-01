@@ -31,6 +31,11 @@ export function telefono(t: string | null | undefined): string | null {
  *  a elegir grupo (ni nombre ni cédula en la URL). */
 export const esCodigoAdei = (v: unknown): v is string => typeof v === "string" && /^ADEI-\d{4}-\d{5}$/.test(v);
 
+/** Nombre de una sucursal en las listas: la sede central se señala igual en todos
+ *  los formularios («Altamira (central)»). */
+export const opcionSucursal = (s: { id: string; nombre: string; es_central: boolean }) =>
+  ({ valor: s.id, texto: s.es_central ? `${s.nombre} (central)` : s.nombre });
+
 /** "1 resultado", "0 resultados", "1,250 resultados". */
 export function cantidad(n: number, singular: string, plural: string): string {
   return `${n.toLocaleString("es-NI")} ${n === 1 ? singular : plural}`;

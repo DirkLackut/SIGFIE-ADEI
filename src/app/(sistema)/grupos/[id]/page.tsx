@@ -65,7 +65,7 @@ export default async function PaginaGrupo({ params, searchParams }: PageProps<"/
       </Seccion>
 
       <Seccion titulo="Inscritos" descripcion={cantidad(filas.length, "estudiante", "estudiantes")}>
-        {editable && !terminado && <div className="mb-5"><Inscribir grupoId={g.id} inicial={esCodigoAdei(inscribir) ? inscribir : undefined} /></div>}
+        {editable && !terminado && <div className="mb-5"><Inscribir grupoId={g.id} inscritos={filas.map((i) => i.estudiante.id)} inicial={esCodigoAdei(inscribir) ? inscribir : undefined} /></div>}
         {editable && terminado && <div className="mb-4"><Alerta tipo="info">El grupo ya terminó: no admite inscripciones nuevas.</Alerta></div>}
         {asistente && g.estado_acta !== "Abierta" && <div className="mb-4"><Alerta tipo="info">El acta fue entregada: no se pueden inscribir ni anular inscripciones.</Alerta></div>}
         <Tabla vacio="Este grupo todavía no tiene inscritos."

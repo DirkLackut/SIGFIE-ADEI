@@ -10,7 +10,7 @@ import { Campo, Selector } from "@/componentes/campos";
 
 /** Inscribir: buscar al estudiante aquí mismo y pulsar "Inscribir". Si se cruza
  *  con otro grupo suyo, se advierte y se pide confirmar (CE-84). */
-export function Inscribir({ grupoId, inicial }: { grupoId: string; inicial?: string }) {
+export function Inscribir({ grupoId, inscritos, inicial }: { grupoId: string; inscritos: string[]; inicial?: string }) {
   const [texto, setTexto] = useState(inicial ?? "");
   const [resultados, setResultados] = useState<FilaBusqueda[] | null>(null);
   const [respuesta, setRespuesta] = useState<{ est: FilaBusqueda; r: RespuestaInscripcion } | null>(null);
@@ -58,7 +58,9 @@ export function Inscribir({ grupoId, inicial }: { grupoId: string; inicial?: str
               <li key={f.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
                 <span><span className="font-mono text-sm font-semibold">{f.codigo_adei}</span> · {f.apellidos}, {f.nombres}
                   {f.estado_matricula !== "Activo" && <span className="text-tinta-suave"> ({f.estado_matricula})</span>}</span>
-                <button className={claseBoton("primario")} disabled={pendiente} onClick={() => hacer(f)}>Inscribir</button>
+                {inscritos.includes(f.id)
+                  ? <span className="text-sm font-semibold text-cian">✓ Ya inscrito</span>
+                  : <button className={claseBoton("primario")} disabled={pendiente} onClick={() => hacer(f)}>Inscribir</button>}
               </li>
             ))}
           </ul>
