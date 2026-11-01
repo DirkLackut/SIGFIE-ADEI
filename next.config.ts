@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { ENCABEZADOS_FIJOS } from "./src/dominio/seguridad";
 
 const nextConfig: NextConfig = {
   // Caché de componentes y prefetch parcial vienen activados en la plantilla de
@@ -11,6 +12,13 @@ const nextConfig: NextConfig = {
 
   turbopack: {
     rules: { "*.css": { loaders: ["@tailwindcss/turbopack"], as: "*.css" } },
+  },
+
+  // Encabezados de seguridad (CE-103, hallazgo A02 de T34). La CSP, que lleva un
+  // nonce por respuesta, la pone proxy.ts. Sin «X-Powered-By: Next.js».
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: ENCABEZADOS_FIJOS }];
   },
 
   // Sin telemetría hacia terceros.

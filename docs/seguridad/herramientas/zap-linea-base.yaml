@@ -1,0 +1,26 @@
+# OWASP ZAP · línea base (pasiva) sin sesión. Solo la copia local.
+env:
+  contexts:
+    - name: sigfie-local
+      urls: ["http://127.0.0.1:3000"]
+      includePaths: ["http://127.0.0.1:3000.*"]
+      excludePaths: ["http://127.0.0.1:3000/salir.*"]
+  parameters:
+    failOnError: true
+    progressToStdout: true
+jobs:
+  - type: spider
+    parameters: { context: sigfie-local, maxDuration: 2, maxDepth: 5 }
+  - type: passiveScan-wait
+    parameters: { maxDuration: 3 }
+  - type: report
+    parameters:
+      template: traditional-html
+      reportDir: docs/seguridad/informes
+      reportFile: zap-linea-base
+      reportTitle: "SIGFIE-ADEI - ZAP linea base"
+  - type: report
+    parameters:
+      template: traditional-json
+      reportDir: docs/seguridad/informes
+      reportFile: zap-linea-base
