@@ -1,0 +1,48 @@
+# --- Datos del cliente: NUNCA se versionan (constitución, principio 3) -------
+# Contienen nombres, cédulas y teléfonos de personas reales, incluidas
+# personas menores de edad. El repositorio es público.
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+*.tsv
+*.sql.gz
+*.dump
+/datos-cliente/
+/migracion/entrada/
+/migracion/salida/
+
+# --- Credenciales ------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Node / Next.js ----------------------------------------------------------
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Supabase ----------------------------------------------------------------
+.branches/
+.temp/
+supabase/.temp/
+
+# --- Python (script de migración) --------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# --- Herramientas y sistema operativo ----------------------------------------
+.vercel
+coverage/
+.vitest/
+.DS_Store
+Thumbs.db
+desktop.ini
