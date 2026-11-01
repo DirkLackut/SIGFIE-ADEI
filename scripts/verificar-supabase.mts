@@ -17,6 +17,7 @@
  * nunca se pega en el chat ni se versiona.
  */
 import pg from "pg";
+import { readdirSync } from "node:fs";
 
 const URL_BD = process.env.SUPABASE_DB_URL;
 if (!URL_BD || URL_BD.includes("[YOUR-PASSWORD]")) {
@@ -32,7 +33,10 @@ const FUNCIONES_DE_USUARIO = [
   "edad", "hoy_managua", "inscribir", "mi_estado_acceso", "mi_organizacion", "mi_profesor_id",
   "normalizar", "registrar_estudiante", "registrar_evento", "tiene_rol", "vincular_tutor",
 ];
-const MIGRACIONES = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010"];
+// Las migraciones que deben estar aplicadas son las del repositorio: así esta lista
+// no se queda atrás cuando se agrega una nueva.
+const MIGRACIONES = readdirSync(new URL("../supabase/migrations/", import.meta.url))
+  .filter((f) => /^\d{3}_.*\.sql$/.test(f)).map((f) => f.slice(0, 3)).sort();
 const ANIO_FICTICIO = 2999;
 
 /**
@@ -106,7 +110,7 @@ try {
   console.log("\nProyecto");
   info((await c.query<{ v: string }>("select current_setting('server_version') v")).rows[0].v.replace(/ .*/, "") + " (PostgreSQL)");
   const aplicadas = await lista(c, "select version x from supabase_migrations.schema_migrations order by 1");
-  revisar(iguales(aplicadas, MIGRACIONES), "migraciones 001 a 010 aplicadas", `aplicadas: ${aplicadas.join(", ")}`);
+  revisar(iguales(aplicadas, MIGRACIONES), `migraciones ${MIGRACIONES[0]} a ${MIGRACIONES.at(-1)} aplicadas (las del repositorio)`, `aplicadas: ${aplicadas.join(", ")}`);
   organizacion = (await c.query<{ id: string }>("select id from public.organizacion where codigo = 'ADEI'")).rows[0]?.id ?? "";
   revisar(organizacion !== "", "existe la organización ADEI (semilla)");
   const aviso = (await c.query<{ v: string }>("select public.aviso_vigente($1) v", [organizacion])).rows[0]?.v;
