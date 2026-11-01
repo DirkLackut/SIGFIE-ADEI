@@ -189,6 +189,12 @@ distintas, y el sistema tiene las dos.
 - **CE-99** · *Retro-2, CE-48* — EL SISTEMA formará el código de estudiante con el prefijo de su organización y llevará los correlativos de estudiantes y de grupos por separado para cada organización. El código de grupo conserva el formato `G-AAAA-NNNN` del diccionario de datos, porque solo se muestra dentro de su organización.
 - **CE-100** · *Retro-6, CE-62* — SI un usuario intenta leer o modificar un registro de otra organización, aunque la petición no pase por la interfaz, ENTONCES EL SISTEMA no se lo devolverá ni lo modificará.
 
+### K. Seguridad de las respuestas *(añadido el 2026-11-01, hallazgos de las pruebas de seguridad T34)*
+
+- **CE-101** · *OWASP A10, hallazgo H2* — SI una operación se refiere a un registro que no existe o que el usuario no puede ver, ENTONCES EL SISTEMA responderá «no existe» (HTTP 404), nunca como error del servidor (HTTP 500).
+- **CE-102** · *OWASP A02, hallazgo H1* — EL SISTEMA enviará con cada página una política de seguridad de contenido que solo permita ejecutar los scripts del propio sistema, marcados con un valor aleatorio por respuesta (nonce), y que prohíba mostrar el sistema dentro de otro sitio.
+- **CE-103** · *OWASP A02, hallazgo H1* — EL SISTEMA enviará con cada respuesta los encabezados `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` y `Cross-Origin-Opener-Policy`, y no anunciará la tecnología del servidor (`X-Powered-By`).
+
 ## Requisitos no funcionales aplicables
 
 | RNF | Qué exige en esta spec | Umbral |

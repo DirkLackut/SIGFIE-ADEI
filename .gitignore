@@ -46,3 +46,6 @@ coverage/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Pruebas de seguridad (T34): credenciales sintéticas de la copia local
+entorno-local.json

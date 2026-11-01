@@ -13,9 +13,20 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/tipos/base-de-datos";
 import { decidirRuta, type EstadoAcceso } from "@/dominio/acceso";
+import { nuevoNonce, politicaDeContenido } from "@/dominio/seguridad";
 
 export async function proxy(request: NextRequest) {
-  let respuesta = NextResponse.next({ request });
+  // CSP con un nonce nuevo (CE-102). Next lo lee del encabezado del pedido y lo
+  // pone en sus propios scripts; el navegador no ejecuta ningún otro.
+  const csp = politicaDeContenido(nuevoNonce(), process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NODE_ENV === "development");
+  const seguir = () => {
+    const encabezados = new Headers(request.headers);   // se copia aquí, con las cookies ya renovadas
+    encabezados.set("Content-Security-Policy", csp);
+    const r = NextResponse.next({ request: { headers: encabezados } });
+    r.headers.set("Content-Security-Policy", csp);
+    return r;
+  };
+  let respuesta = seguir();
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -24,7 +35,7 @@ export async function proxy(request: NextRequest) {
         getAll: () => request.cookies.getAll(),
         setAll: (lista) => {
           lista.forEach(({ name, value }) => request.cookies.set(name, value));
-          respuesta = NextResponse.next({ request });
+          respuesta = seguir();
           lista.forEach(({ name, value, options }) => respuesta.cookies.set(name, value, options));
         },
       },
@@ -43,6 +54,7 @@ export async function proxy(request: NextRequest) {
   if (decision.tipo === "seguir") return respuesta;
 
   const destino = NextResponse.redirect(new URL(decision.a, request.url));
+  destino.headers.set("Content-Security-Policy", csp);
   respuesta.cookies.getAll().forEach((c) => destino.cookies.set(c));   // conserva la sesión renovada
   return destino;
 }

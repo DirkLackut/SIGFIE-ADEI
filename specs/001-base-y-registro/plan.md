@@ -97,6 +97,7 @@ Las migraciones se aplican en este orden:
 | `008_operaciones.sql` | Funciones de negocio (sección 6) |
 | `009_semilla.sql` | La organización ADEI; sus sucursales, modalidades, horarios y niveles. **Sin profesores ni estudiantes** |
 | `010_sesion_app.sql` | Lo que la app necesita para guiar la sesión: `mi_estado_acceso()` (estado, roles y aviso en una consulta), `crear_cuenta()` y `asignar_roles()` (cuenta y roles en una transacción), y el permiso de `service_role` para quitar la marca de contraseña temporal. Agregada en el bloque 3 |
+| `011_no_existe_404.sql` | Las cinco funciones que avisaban «no existe» usan el código `PT404`, que PostgREST devuelve como 404 y no como 500 (CE-101, D22). Solo reemplaza funciones: no toca tablas ni datos. |
 
 ### 4.1 Tablas y restricciones
 
@@ -258,6 +259,20 @@ Los permisos de un usuario con varios roles son la unión de las filas (CE-2).
 Como RLS lee `grupo.profesor_id` en cada consulta, cambiar el profesor de un
 grupo le retira el acceso al anterior **en la consulta siguiente** (CE-52).
 
+### 5.7 Encabezados de seguridad (CE-102, CE-103, D23)
+
+Hallazgo de las pruebas de seguridad (T34). `src/dominio/seguridad.ts` define la
+política y los encabezados, con sus pruebas:
+
+- **CSP**, creada en `proxy.ts` con un nonce nuevo en cada respuesta: scripts solo con
+  el nonce (`'strict-dynamic'`), conexiones solo al sitio y a Supabase,
+  `frame-ancestors 'none'`, `object-src 'none'`, `base-uri 'self'` y
+  `form-action 'self'`.
+- **Fijos**, en `next.config.ts`: `X-Content-Type-Options`, `X-Frame-Options`,
+  `Referrer-Policy`, `Permissions-Policy` y `Cross-Origin-Opener-Policy`. Además,
+  `poweredByHeader: false`.
+- El layout raíz llama a `connection()`: ninguna página se prearma, y todas llevan su nonce.
+
 ---
 
 ## 6. Operaciones de negocio
@@ -366,6 +381,8 @@ publica: **la API ofrece solo las operaciones de la tabla de arriba.**
 | D19 | `motion` para entrar y salir de elementos y cambios de altura | Solo CSS | CSS no anima la salida de un elemento que React quita (un aviso que se cierra, una inscripción anulada) ni la altura automática de un panel que se despliega. Se usa con `LazyMotion` para cargar solo lo necesario. Reglas de uso en §14 |
 | D20 | `sonner` para confirmaciones pasajeras | Avisos hechos a mano, o mostrar todo en la página | Lo que se hizo en el lugar (copiar, vincular, guardar roles) se confirma sin mover la página. Los errores **no** van en toasts: quedan junto al campo (CE-37) |
 | D21 | Libre Baskerville desde `@fontsource/libre-baskerville` | Baskerville Old Face del manual | Baskerville Old Face es comercial (Monotype/Microsoft) y no se puede publicar en la web; Libre Baskerville tiene licencia OFL. Mismo motivo que D16 para servirla desde el paquete |
+| D22 | Código `PT404` en los errores «no existe» | `no_data_found` (P0002) | PostgREST no conoce P0002 y lo devolvía como 500: parecía una falla del servidor cuando era un pedido sobre algo inexistente o ajeno. `PTnnn` es la forma documentada de PostgREST de elegir el código HTTP. La app traduce los errores por mensaje y restricción, así que no cambia. |
+| D23 | CSP con nonce por respuesta, creada en `proxy.ts`; los demás encabezados en `next.config.ts` | CSP fija con `'unsafe-inline'` en los scripts | Con nonce, un script inyectado no se ejecuta aunque llegue a la página. Exige que cada página se genere al pedirla, algo que estas pantallas ya hacían por la sesión. Los estilos sí llevan `'unsafe-inline'`, porque `motion` y `sonner` escriben estilos en los elementos, y un estilo no ejecuta código. |
 | D16 | Montserrat desde el paquete npm `@fontsource/montserrat` | `next/font/google` | `next/font/google` descarga la fuente al compilar desde Google, que no es alcanzable desde el entorno de trabajo; además, servir la fuente propia evita enviar la IP de cada usuario a Google |
 | D13 | Generador propio de datos sintéticos | Biblioteca de datos falsos (faker) | Una dependencia para generar nombres no se justifica (principio 7) |
 | D15 | **Multi-tenant con tablas compartidas, `organizacion_id` y RLS** | Un esquema de Postgres por organización, o un proyecto de Supabase por organización | Un esquema por organización obliga a repetir cada migración N veces; un proyecto por organización choca con el límite de proyectos gratuitos. Con RLS, el aislamiento usa el mismo mecanismo que ya protege los roles |
@@ -385,7 +402,9 @@ publica: **la API ofrece solo las operaciones de la tabla de arriba.**
 | `sonner` | Confirmaciones pasajeras (D20) |
 | `pg` (desarrollo) | Script de verificación de Supabase real (T16) |
 
-Las versiones exactas se fijan al instalar y quedan en `package-lock.json`.
+Todas las dependencias llevan versión exacta en `package.json` (sin `^` ni `~`), y
+`.npmrc` tiene `save-exact=true`: hallazgo H3 de T34. `package-lock.json` fija además
+las dependencias de las dependencias.
 
 ---
 

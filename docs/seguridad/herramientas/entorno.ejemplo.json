@@ -1,0 +1,65 @@
+{
+  "name": "SIGFIE local (sintético)",
+  "values": [
+    {
+      "key": "app",
+      "value": "http://127.0.0.1:3000"
+    },
+    {
+      "key": "api",
+      "value": "http://127.0.0.1:54321"
+    },
+    {
+      "key": "anon",
+      "value": "<<clave anon de la copia LOCAL>>"
+    },
+    {
+      "key": "correo_asistente",
+      "value": "<<lo escribe preparar.mjs>>"
+    },
+    {
+      "key": "correo_profesor",
+      "value": "<<lo escribe preparar.mjs>>"
+    },
+    {
+      "key": "correo_otra",
+      "value": "<<lo escribe preparar.mjs>>"
+    },
+    {
+      "key": "grupo_ajeno",
+      "value": ""
+    },
+    {
+      "key": "correo_direccion",
+      "value": "<<lo escribe preparar.mjs>>"
+    },
+    {
+      "key": "clave",
+      "value": "<<lo escribe preparar.mjs>>"
+    },
+    {
+      "key": "org_otra",
+      "value": ""
+    },
+    {
+      "key": "org_adei",
+      "value": ""
+    },
+    {
+      "key": "estudiante_otra",
+      "value": ""
+    },
+    {
+      "key": "estudiante_adei",
+      "value": ""
+    },
+    {
+      "key": "grupo_adei",
+      "value": ""
+    },
+    {
+      "key": "service_key_fragmento",
+      "value": ""
+    }
+  ]
+}

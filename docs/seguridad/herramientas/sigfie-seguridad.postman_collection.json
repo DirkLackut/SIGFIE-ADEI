@@ -1,0 +1,2352 @@
+{
+  "info": {
+    "name": "SIGFIE-ADEI · Pruebas de seguridad (OWASP Top 10:2025)",
+    "description": "T34. Se ejecuta con Newman SOLO contra la copia local con datos sintéticos. Nunca contra Supabase de producción ni contra Vercel.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "const local = /^http:\\/\\/(127\\.0\\.0\\.1|localhost)(:\\d+)?$/;",
+          "if (!local.test(pm.variables.get('app')) || !local.test(pm.variables.get('api'))) {",
+          "  pm.execution.skipRequest();",
+          "  throw new Error('Solo se permite correr contra la copia local (127.0.0.1 o localhost). Nunca contra producción.');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "0 · Preparación",
+      "description": "Inicia sesión con cuatro cuentas sintéticas: Asistente, Profesor y Dirección de ADEI, y la Asistente de una organización ficticia.",
+      "item": [
+        {
+          "name": "Iniciar sesión: asistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/auth/v1/token?grant_type=password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{correo_asistente}}\",\"password\":\"{{clave}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Ingresa con la cuenta sintética (asistente)\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.collectionVariables.set(\"tok_asistente\", r.access_token);",
+                  "pm.collectionVariables.set(\"uid_asistente\", r.user.id);",
+                  "// Cookie de sesión con el formato de @supabase/ssr, para probar las pantallas.",
+                  "const valor = \"base64-\" + Buffer.from(JSON.stringify(r)).toString(\"base64\").replace(/\\+/g, \"-\").replace(/\\//g, \"_\").replace(/=+$/, \"\");",
+                  "pm.collectionVariables.set(\"cookie_asistente\", \"sb-localhost-auth-token=\" + valor);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aceptar aviso de privacidad: asistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/aceptar_aviso",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_version\":\"v0.1\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Acepta el aviso en esta sesión (CE-16)\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Iniciar sesión: profesor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/auth/v1/token?grant_type=password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{correo_profesor}}\",\"password\":\"{{clave}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Ingresa con la cuenta sintética (profesor)\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.collectionVariables.set(\"tok_profesor\", r.access_token);",
+                  "pm.collectionVariables.set(\"uid_profesor\", r.user.id);",
+                  "// Cookie de sesión con el formato de @supabase/ssr, para probar las pantallas.",
+                  "const valor = \"base64-\" + Buffer.from(JSON.stringify(r)).toString(\"base64\").replace(/\\+/g, \"-\").replace(/\\//g, \"_\").replace(/=+$/, \"\");",
+                  "pm.collectionVariables.set(\"cookie_profesor\", \"sb-localhost-auth-token=\" + valor);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aceptar aviso de privacidad: profesor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/aceptar_aviso",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_version\":\"v0.1\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Acepta el aviso en esta sesión (CE-16)\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Iniciar sesión: otra",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/auth/v1/token?grant_type=password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{correo_otra}}\",\"password\":\"{{clave}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Ingresa con la cuenta sintética (otra)\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.collectionVariables.set(\"tok_otra\", r.access_token);",
+                  "pm.collectionVariables.set(\"uid_otra\", r.user.id);",
+                  "// Cookie de sesión con el formato de @supabase/ssr, para probar las pantallas.",
+                  "const valor = \"base64-\" + Buffer.from(JSON.stringify(r)).toString(\"base64\").replace(/\\+/g, \"-\").replace(/\\//g, \"_\").replace(/=+$/, \"\");",
+                  "pm.collectionVariables.set(\"cookie_otra\", \"sb-localhost-auth-token=\" + valor);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aceptar aviso de privacidad: otra",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/aceptar_aviso",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_version\":\"v0.1\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Acepta el aviso en esta sesión (CE-16)\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Iniciar sesión: direccion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/auth/v1/token?grant_type=password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{correo_direccion}}\",\"password\":\"{{clave}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Ingresa con la cuenta sintética (direccion)\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.collectionVariables.set(\"tok_direccion\", r.access_token);",
+                  "pm.collectionVariables.set(\"uid_direccion\", r.user.id);",
+                  "// Cookie de sesión con el formato de @supabase/ssr, para probar las pantallas.",
+                  "const valor = \"base64-\" + Buffer.from(JSON.stringify(r)).toString(\"base64\").replace(/\\+/g, \"-\").replace(/\\//g, \"_\").replace(/=+$/, \"\");",
+                  "pm.collectionVariables.set(\"cookie_direccion\", \"sb-localhost-auth-token=\" + valor);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Aceptar aviso de privacidad: direccion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/aceptar_aviso",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_version\":\"v0.1\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Acepta el aviso en esta sesión (CE-16)\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Leer la sucursal central de ADEI (dato para las pruebas)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/sucursal?select=id&es_central=eq.true"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La Asistente ve su sucursal central\", () => pm.expect(pm.response.json()).to.have.lengthOf(1)); pm.collectionVariables.set(\"sucursal_adei\", pm.response.json()[0].id);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "A01 · Control de acceso",
+      "description": "Que nadie vea ni cambie lo que no le corresponde: sin sesión, por rol y entre organizaciones.",
+      "item": [
+        {
+          "name": "Sin sesión, /inicio manda al ingreso",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{app}}/inicio"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde con una redirección\", () => pm.expect(pm.response.code).to.be.oneOf([302, 303, 307, 308]));",
+                  "pm.test(\"La redirección va a /ingresar\", () => pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/ingresar\"));"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "Sin sesión, /estudiantes manda al ingreso",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{app}}/estudiantes"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde con una redirección\", () => pm.expect(pm.response.code).to.be.oneOf([302, 303, 307, 308]));",
+                  "pm.test(\"La redirección va a /ingresar\", () => pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/ingresar\"));"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "Sin sesión, /cuentas manda al ingreso",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{app}}/cuentas"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde con una redirección\", () => pm.expect(pm.response.code).to.be.oneOf([302, 303, 307, 308]));",
+                  "pm.test(\"La redirección va a /ingresar\", () => pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/ingresar\"));"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "Sin sesión, /grupos/{{grupo_adei}} manda al ingreso",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{app}}/grupos/{{grupo_adei}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde con una redirección\", () => pm.expect(pm.response.code).to.be.oneOf([302, 303, 307, 308]));",
+                  "pm.test(\"La redirección va a /ingresar\", () => pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/ingresar\"));"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "Clave pública (anon) sin sesión no lee estudiantes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?select=id,nombres"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Clave pública sin sesión no lee cuentas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/usuario?select=id,nombre_usuario"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Clave pública sin sesión no lee la auditoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/auditoria?select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Clave pública sin sesión no lee tutores",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/tutor?select=id,cedula"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente de ADEI no ve el estudiante de otra organización",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?id=eq.{{estudiante_otra}}&select=id,nombres"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente de ADEI no ve la otra organización",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/organizacion?id=eq.{{org_otra}}&select=id,nombre"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente de otra organización no ve los estudiantes de ADEI",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?organizacion_id=eq.{{org_adei}}&select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente de otra organización no modifica un estudiante de ADEI",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?id=eq.{{estudiante_adei}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"telefono\":\"80000000\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No modifica ninguna fila\", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente de otra organización no inscribe en un grupo de ADEI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/inscribir",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_estudiante\":\"{{estudiante_adei}}\",\"p_grupo\":\"{{grupo_adei}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no registra estudiantes (solo la Asistente)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_estudiante",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"nombres\":\"Intruso\",\"apellidos\":\"Prueba\",\"fecha_nacimiento\":\"1990-01-01\",\"telefono\":\"88887777\",\"sucursal_id\":\"00000000-0000-0000-0000-000000000000\"}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no se da a sí mismo el rol de Asistente (tabla)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/usuario_rol",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"organizacion_id\":\"{{org_adei}}\",\"usuario_id\":\"{{uid_profesor}}\",\"rol\":\"asistente\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no se da a sí mismo el rol de Asistente (función)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/asignar_roles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_usuario\":\"{{uid_profesor}}\",\"p_roles\":[\"asistente\"],\"p_profesor\":null}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no lee el grupo de otro profesor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/grupo?id=eq.{{grupo_ajeno}}&select=id,codigo_grupo"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor solo ve sus propios grupos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/grupo?select=id,profesor_id,profesor(nombres)"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const filas = pm.response.json();",
+                  "pm.test(\"Ve al menos su grupo\", () => pm.expect(filas.length).to.be.above(0));",
+                  "pm.test(\"Todos los grupos que ve son suyos\", () => filas.forEach((f) => pm.expect(f.profesor.nombres).to.eql(\"Carla\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no registra estudiantes (solo lee)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_estudiante",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"nombres\":\"Intruso\",\"apellidos\":\"Direccion\",\"fecha_nacimiento\":\"1990-01-01\",\"telefono\":\"88887777\",\"sucursal_id\":\"{{sucursal_adei}}\"}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no modifica un expediente",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?id=eq.{{estudiante_adei}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"telefono\":\"80000000\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No modifica ninguna fila\", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección sí lee los expedientes de su organización (control)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?id=eq.{{estudiante_adei}}&select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Ve el expediente: la prueba anterior falló por permiso, no por no verlo\", () => pm.expect(pm.response.json()).to.have.lengthOf(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no lee la auditoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/auditoria?select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente no puede borrar la auditoría",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "url": "{{api}}/rest/v1/auditoria?id=gt.0"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No borra ninguna fila\", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sesión nueva sin aceptar el aviso no lee datos (CE-15)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_sin_aviso}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas hasta aceptar el aviso\", () => pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({ url: pm.variables.get(\"api\") + \"/auth/v1/token?grant_type=password\", method: \"POST\",",
+                  "  header: { apikey: pm.variables.get(\"anon\"), \"Content-Type\": \"application/json\" },",
+                  "  body: { mode: \"raw\", raw: JSON.stringify({ email: pm.variables.get(\"correo_asistente\"), password: pm.variables.get(\"clave\") }) } },",
+                  "  (e, r) => pm.collectionVariables.set(\"tok_sin_aviso\", r.json().access_token));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pantalla: el Profesor no entra a Cuentas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie_profesor}}"
+              }
+            ],
+            "url": "{{app}}/cuentas"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Lo manda al inicio con aviso de permiso\", () => { pm.expect(pm.response.code).to.be.oneOf([302, 303, 307]); pm.expect(pm.response.headers.get(\"Location\")).to.include(\"sin-permiso\"); });"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "Pantalla: el expediente de otra organización no existe para ADEI",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie_asistente}}"
+              }
+            ],
+            "url": "{{app}}/estudiantes/{{estudiante_otra}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No muestra el nombre del estudiante ajeno\", () => pm.expect(pm.response.text()).to.not.include(\"OTRAORG\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Control: la misma acción desde el propio sitio sí responde",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Next-Action",
+                "value": "{{id_accion_ingreso}}"
+              },
+              {
+                "key": "Origin",
+                "value": "{{app}}"
+              },
+              {
+                "key": "Accept",
+                "value": "text/x-component"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/plain;charset=UTF-8"
+              }
+            ],
+            "url": "{{app}}/ingresar",
+            "body": {
+              "mode": "raw",
+              "raw": "[{},\"$K1\"]"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con el resultado de la acción (prueba que el método funciona)\", () => { pm.response.to.have.status(200); pm.expect(pm.response.text()).to.include(\"mensaje\"); });"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest(pm.variables.get(\"app\") + \"/ingresar\", (e, r) => {",
+                  "  const m = r.text().match(/\\$ACTION_1:0\" value=\"(\\{[^\"]+\\})/);",
+                  "  pm.collectionVariables.set(\"id_accion_ingreso\", m ? JSON.parse(m[1].replace(/&quot;/g, '\"')).id : \"no-encontrada\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "Una acción enviada desde otro sitio se aborta (CSRF)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Next-Action",
+                "value": "{{id_accion_ingreso}}"
+              },
+              {
+                "key": "Origin",
+                "value": "https://sitio-malicioso.example"
+              },
+              {
+                "key": "Accept",
+                "value": "text/x-component"
+              },
+              {
+                "key": "Content-Type",
+                "value": "text/plain;charset=UTF-8"
+              }
+            ],
+            "url": "{{app}}/ingresar",
+            "body": {
+              "mode": "raw",
+              "raw": "[{},\"$K1\"]"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Se encontró el identificador de la acción de ingreso\", () => pm.expect(pm.variables.get(\"id_accion_ingreso\")).to.match(/^[0-9a-f]{40,}$/));",
+                  "pm.test(\"Next no ejecuta la acción: no responde como un ingreso normal\", () => pm.expect(pm.response.code).to.not.eql(200));",
+                  "pm.test(\"No devuelve el resultado de la acción\", () => pm.expect(pm.response.text()).to.not.include(\"mensaje\"));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest(pm.variables.get(\"app\") + \"/ingresar\", (e, r) => {",
+                  "  const m = r.text().match(/\\$ACTION_1:0\" value=\"(\\{[^\"]+\\})/);",
+                  "  pm.collectionVariables.set(\"id_accion_ingreso\", m ? JSON.parse(m[1].replace(/&quot;/g, '\"')).id : \"no-encontrada\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        },
+        {
+          "name": "Salir no redirige a sitios externos (redirección abierta)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{app}}/salir?motivo=https://sitio-malicioso.example"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La redirección se queda en /ingresar\", () => { const l = pm.response.headers.get(\"Location\"); pm.expect(l).to.match(/^\\/ingresar\\?motivo=salio$/); });"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "followRedirects": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "A02 · Configuración",
+      "description": "Que el servidor y la API no expongan más de lo necesario.",
+      "item": [
+        {
+          "name": "El esquema interno no está expuesto por la API",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept-Profile",
+                "value": "interno"
+              }
+            ],
+            "url": "{{api}}/rest/v1/nivel?select=id&limit=0"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La API rechaza el esquema interno (PGRST106)\", () => { pm.response.to.have.status(406); pm.expect(pm.response.json().code).to.eql(\"PGRST106\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El registro público de cuentas está desactivado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/auth/v1/signup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"intruso@ejemplo.invalid\",\"password\":\"Intruso 2026 largo\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No deja crear cuentas desde fuera\", () => pm.expect(pm.response.code).to.be.within(400, 499));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Encabezados de seguridad en la pantalla de ingreso",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{app}}/ingresar"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const h = (n) => (pm.response.headers.get(n) || \"\").toLowerCase();",
+                  "pm.test(\"Prohíbe mostrarse dentro de otro sitio (clickjacking)\", () => pm.expect(h(\"x-frame-options\") === \"deny\" || h(\"content-security-policy\").includes(\"frame-ancestors 'none'\")).to.be.true);",
+                  "pm.test(\"Tiene política de seguridad de contenido (CSP)\", () => pm.expect(h(\"content-security-policy\")).to.include(\"default-src\"));",
+                  "pm.test(\"X-Content-Type-Options: nosniff\", () => pm.expect(h(\"x-content-type-options\")).to.eql(\"nosniff\"));",
+                  "pm.test(\"Referrer-Policy restrictiva\", () => pm.expect(h(\"referrer-policy\")).to.be.oneOf([\"strict-origin-when-cross-origin\", \"no-referrer\", \"same-origin\"]));",
+                  "pm.test(\"No anuncia la tecnología del servidor (X-Powered-By)\", () => pm.expect(pm.response.headers.has(\"X-Powered-By\")).to.be.false);",
+                  "pm.test(\"Restringe permisos del navegador (Permissions-Policy)\", () => pm.expect(h(\"permissions-policy\")).to.include(\"camera=()\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una dirección inexistente responde 404 sin detalles internos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie_asistente}}"
+              }
+            ],
+            "url": "{{app}}/no-existe-esta-pagina"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Sin trazas ni rutas del servidor\", () => pm.expect(pm.response.text()).to.not.match(/node_modules|\\/home\\/|\\bat \\w+ \\(/));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "A04 · Secretos y criptografía",
+      "description": "Que las claves no se filtren y que no se pueda falsificar una sesión.",
+      "item": [
+        {
+          "name": "La clave de servicio no llega al navegador (HTML ni JavaScript)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{app}}/ingresar"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const frag = pm.variables.get(\"service_key_fragmento\");",
+                  "pm.test(\"No está en el HTML\", () => pm.expect(pm.response.text()).to.not.include(frag));",
+                  "const scripts = [...pm.response.text().matchAll(/src=\"(\\/_next\\/static\\/[^\"]+\\.js)\"/g)].map((m) => m[1]);",
+                  "pm.test(\"La página carga sus archivos JavaScript\", () => pm.expect(scripts.length).to.be.above(0));",
+                  "scripts.forEach((s) => pm.sendRequest(pm.variables.get(\"app\") + s, (e, r) =>",
+                  "  pm.test(\"Sin la clave de servicio: \" + s.split(\"/\").pop(), () => pm.expect(r.text()).to.not.include(frag))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un token con la firma alterada se rechaza",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_alterado}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const t = pm.variables.get(\"tok_asistente\").split(\".\"); const firma = t[2]; pm.collectionVariables.set(\"tok_alterado\", t[0] + \".\" + t[1] + \".\" + (firma[0] === \"A\" ? \"B\" : \"A\") + firma.slice(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un token sin firma (alg: none) se rechaza",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_none}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const t = pm.variables.get(\"tok_asistente\").split(\".\");",
+                  "const b64 = (o) => Buffer.from(JSON.stringify(o)).toString(\"base64\").replace(/=+$/, \"\").replace(/\\+/g, \"-\").replace(/\\//g, \"_\");",
+                  "const carga = JSON.parse(Buffer.from(t[1].replace(/-/g, \"+\").replace(/_/g, \"/\"), \"base64\").toString()); carga.role = \"service_role\";",
+                  "pm.collectionVariables.set(\"tok_none\", b64({ alg: \"none\", typ: \"JWT\" }) + \".\" + b64(carga) + \".\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "A05 · Inyección",
+      "description": "Que lo que escribe una persona se trate siempre como dato.",
+      "item": [
+        {
+          "name": "Búsqueda con inyección SQL clásica",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/buscar_estudiantes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_texto\":\"' OR 1=1 --\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde sin error\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"El texto se trata como dato: 0 resultados\", () => pm.expect(pm.response.json().total || 0).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Búsqueda con UNION SELECT",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/buscar_estudiantes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_texto\":\"x' UNION SELECT nombre_usuario FROM usuario --\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde sin error\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"El texto se trata como dato: 0 resultados\", () => pm.expect(pm.response.json().total || 0).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Búsqueda con comodines LIKE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/buscar_estudiantes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_texto\":\"%%%\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde sin error\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"El texto se trata como dato: 0 resultados\", () => pm.expect(pm.response.json().total || 0).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Filtro de la API con comillas no altera la consulta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?nombres=eq.x'%20or%20'1'='1&select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 y sin filas\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un nombre con etiquetas HTML se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_estudiante",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"nombres\":\"<script>alert(1)</script>\",\"apellidos\":\"Prueba\",\"fecha_nacimiento\":\"1990-01-01\",\"telefono\":\"88887777\",\"sucursal_id\":\"{{sucursal_adei}}\"}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar a un adulto con HTML en la dirección (para la prueba siguiente)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_estudiante",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"nombres\":\"Xss\",\"apellidos\":\"Sintetico Prueba\",\"fecha_nacimiento\":\"1991-02-03\",\"telefono\":\"88776655\",\"sucursal_id\":\"{{sucursal_adei}}\",\"direccion\":\"<script>alert(\\\"xss\\\")</script><img src=x onerror=alert(1)>\"},\"p_confirmar_distinto\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Se registra (la dirección admite texto libre)\", () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json(); pm.collectionVariables.set(\"estudiante_xss\", r.id || (r.estudiante && r.estudiante.id) || \"\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El HTML guardado se muestra como texto, no se ejecuta (XSS almacenado)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie_asistente}}"
+              }
+            ],
+            "url": "{{app}}/estudiantes/{{estudiante_xss}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La pantalla abre\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"No aparece la etiqueta <script> del dato\", () => pm.expect(pm.response.text()).to.not.include('<script>alert(\"xss\")'));",
+                  "pm.test(\"No aparece el atributo onerror activo\", () => pm.expect(pm.response.text()).to.not.include(\"<img src=x onerror\"));",
+                  "pm.test(\"El texto aparece escapado\", () => pm.expect(pm.response.text()).to.include(\"&lt;script&gt;\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "A07 · Autenticación",
+      "description": "Que no se pueda adivinar cuentas ni reutilizar sesiones cerradas.",
+      "item": [
+        {
+          "name": "Contraseña incorrecta de una cuenta que sí existe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/auth/v1/token?grant_type=password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{correo_asistente}}\",\"password\":\"Contraseña equivocada 1\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "const r = pm.response.json(); pm.collectionVariables.set(\"fallo_existente\", JSON.stringify([r.error_code || r.error, r.msg || r.error_description]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cuenta que no existe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/auth/v1/token?grant_type=password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"nadie-existe@sigfie.invalid\",\"password\":\"Contraseña equivocada 1\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400));",
+                  "const r = pm.response.json(); pm.collectionVariables.set(\"fallo_inexistente\", JSON.stringify([r.error_code || r.error, r.msg || r.error_description]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Los dos fallos dan la misma respuesta (no se puede averiguar qué cuentas existen)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{app}}/ingresar"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Mismo código y mismo mensaje\", () => pm.expect(pm.variables.get(\"fallo_existente\")).to.eql(pm.variables.get(\"fallo_inexistente\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La sesión se invalida al salir",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_salir}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/auth/v1/logout?scope=local"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Cierra la sesión\", () => pm.expect(pm.response.code).to.be.oneOf([200, 204]));",
+                  "pm.sendRequest({ url: pm.variables.get(\"api\") + \"/auth/v1/token?grant_type=refresh_token\", method: \"POST\",",
+                  "  header: { apikey: pm.variables.get(\"anon\"), \"Content-Type\": \"application/json\" },",
+                  "  body: { mode: \"raw\", raw: JSON.stringify({ refresh_token: pm.variables.get(\"ref_salir\") }) } },",
+                  "  (e, r) => pm.test(\"El token de renovación ya no sirve\", () => pm.expect(r.code).to.be.within(400, 499)));"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({ url: pm.variables.get(\"api\") + \"/auth/v1/token?grant_type=password\", method: \"POST\",",
+                  "  header: { apikey: pm.variables.get(\"anon\"), \"Content-Type\": \"application/json\" },",
+                  "  body: { mode: \"raw\", raw: JSON.stringify({ email: pm.variables.get(\"correo_asistente\"), password: pm.variables.get(\"clave\") }) } },",
+                  "  (e, r) => { pm.collectionVariables.set(\"tok_salir\", r.json().access_token); pm.collectionVariables.set(\"ref_salir\", r.json().refresh_token); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "A09 · Registro (auditoría)",
+      "description": "Que la auditoría no se pueda falsificar, alterar ni leer sin permiso.",
+      "item": [
+        {
+          "name": "Sin sesión no se pueden escribir eventos en la auditoría",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_evento",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_tipo\":\"Acceso\",\"p_entidad\":\"prueba\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No se pueden inventar tipos de evento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_evento",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_tipo\":\"Eliminación\",\"p_entidad\":\"estudiante\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nadie puede modificar un registro de auditoría",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/auditoria?id=gt.0",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"detalle\":\"alterado\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar un estudiante deja rastro en la auditoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion_o_sql}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/auditoria?registro_afectado=eq.{{estudiante_xss}}&select=tipo_accion,usuario_id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La Asistente no lee la auditoría: solo Dirección (CE-19)\", () => pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set(\"tok_direccion_o_sql\", pm.variables.get(\"tok_asistente\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "A10 · Errores y excepciones",
+      "description": "Que un dato inesperado termine en un mensaje claro y no en una caída o una traza.",
+      "item": [
+        {
+          "name": "Un identificador mal formado en la dirección da 404, no un error",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie_asistente}}"
+              }
+            ],
+            "url": "{{app}}/grupos/esto-no-es-un-uuid"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404)); pm.test(\"Sin trazas\", () => pm.expect(pm.response.text()).to.not.match(/node_modules|\\bat \\w+ \\(/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un expediente inexistente da 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie_asistente}}"
+              }
+            ],
+            "url": "{{app}}/estudiantes/00000000-0000-0000-0000-000000000000"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "JSON mal formado a la API se rechaza sin detalles internos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/buscar_estudiantes",
+            "body": {
+              "mode": "raw",
+              "raw": "{ esto no es json"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 400\", () => pm.response.to.have.status(400)); pm.test(\"Sin trazas\", () => pm.expect(pm.response.text()).to.not.match(/stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un tipo de dato equivocado se rechaza sin caer el servicio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/inscribir",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_estudiante\":\"no-es-uuid\",\"p_grupo\":12345}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 4xx, no 5xx\", () => pm.expect(pm.response.code).to.be.within(400, 499));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

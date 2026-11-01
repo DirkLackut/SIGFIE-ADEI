@@ -353,7 +353,7 @@ en la spec, como cualquier otro.
     ninguna imagen tiene datos reales; cada GIF pesa menos de 3 MB; el README se ve
     bien en GitHub.
 
-- [ ] **T33 · Aquí · [demo]** Plan de pruebas de seguridad
+- [x] **T33 · Aquí · [demo]** Plan de pruebas de seguridad
   (`docs/seguridad/plan.md`): cada categoría del OWASP Top 10 vigente relacionada
   con la prueba que la cubre, la herramienta, el entorno y el resultado esperado.
   Incluye lo que ya cubren las pruebas automáticas (RLS, permisos, aislamiento
@@ -362,7 +362,7 @@ en la spec, como cualquier otro.
   - Hecho cuando: cada categoría tiene prueba o una razón escrita de por qué no
     aplica.
 
-- [ ] **T34 · Aquí · [demo]** Ejecución automática de las pruebas de seguridad,
+- [x] **T34 · Aquí · [demo]** Ejecución automática de las pruebas de seguridad,
   **solo contra la copia local con datos sintéticos, nunca contra `sigfie-adei`**:
   - colección de Postman ejecutada con Newman (informe HTML): acceso sin sesión,
     rol Dirección intentando escribir, profesor leyendo grupos ajenos, otra
@@ -377,6 +377,17 @@ en la spec, como cualquier otro.
   - Hecho cuando: cada prueba del plan tiene su resultado con evidencia, y cada
     hallazgo tiene una respuesta (corregido por la spec, aceptado con razón, o
     diferido).
+  - *2026-11-01, hecho:* el plan sigue el OWASP Top 10:2025. Se usaron Newman 6.2.3
+    (79 peticiones y 107 comprobaciones) y ZAP 2.17.0, con línea base y escaneo
+    completo con sesión, antes y después de corregir. Hubo 3 hallazgos, los tres
+    corregidos:
+    - H1, encabezados: CE-102, CE-103 y D23.
+    - H2, 500 en «no existe»: CE-101, D22 y la migración 011.
+    - H3, versiones exactas.
+
+    Las alertas de ZAP que quedan están justificadas en `docs/seguridad/resultados.md`.
+    **Falta en producción:** aplicar la migración 011 con `npx supabase db push`
+    antes o junto con el despliegue.
 
 ## Trazabilidad: criterios por tarea
 

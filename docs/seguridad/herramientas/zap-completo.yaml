@@ -1,0 +1,49 @@
+# OWASP ZAP · escaneo completo con sesión de la Asistente sintética. Solo la copia local.
+# La cookie se inyecta en cada pedido con el trabajo "replacer".
+env:
+  contexts:
+    - name: sigfie-local
+      urls:
+        - "http://127.0.0.1:3000/inicio?aviso=sin-permiso"
+        - "http://127.0.0.1:3000/estudiantes?q=castillo"
+        - "http://127.0.0.1:3000/estudiantes/nuevo"
+        - "http://127.0.0.1:3000/estudiantes/<<id de un estudiante sintético>>"
+        - "http://127.0.0.1:3000/grupos"
+        - "http://127.0.0.1:3000/grupos/nuevo"
+        - "http://127.0.0.1:3000/catalogos?ver=profesores"
+        - "http://127.0.0.1:3000/catalogos?ver=niveles"
+      includePaths: ["http://127.0.0.1:3000.*"]
+      excludePaths:
+        - "http://127.0.0.1:3000/salir.*"        # cerraría la sesión
+        - "http://127.0.0.1:3000/cuentas.*"      # podría desactivar o restablecer la propia cuenta
+  parameters:
+    failOnError: true
+    progressToStdout: true
+jobs:
+  - type: replacer
+    parameters: { deleteAllRules: true }
+    rules:
+      - description: "Sesión de la Asistente sintética"
+        matchType: req_header
+        matchString: Cookie
+        matchRegex: false
+        replacementString: "<<cookie que imprime cookie.mjs>>"
+  - type: spider
+    parameters: { context: sigfie-local, maxDuration: 3, maxDepth: 6, postForm: false }
+  - type: passiveScan-wait
+    parameters: { maxDuration: 5 }
+  - type: activeScan
+    parameters: { context: sigfie-local, maxRuleDurationInMins: 3, maxScanDurationInMins: 25, threadPerHost: 4 }
+  - type: passiveScan-wait
+    parameters: { maxDuration: 5 }
+  - type: report
+    parameters:
+      template: traditional-html
+      reportDir: docs/seguridad/informes
+      reportFile: zap-completo-despues
+      reportTitle: "SIGFIE-ADEI - ZAP escaneo completo con sesion - DESPUES de las correcciones"
+  - type: report
+    parameters:
+      template: traditional-json
+      reportDir: docs/seguridad/informes
+      reportFile: zap-completo-despues

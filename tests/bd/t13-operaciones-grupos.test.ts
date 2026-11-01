@@ -224,3 +224,18 @@ test("el motivo de una operación no se filtra a la siguiente transacción", asy
     "select detalle from auditoria where entidad = 'grupo' and tipo_accion = 'Creación' order by id desc limit 1");
   expect(a.rows[0].detalle).toBeNull();
 });
+
+describe("CE-101 · «no existe» responde con el código PT404 (PostgREST lo devuelve como 404)", () => {
+  const ninguno = "00000000-0000-0000-0000-000000000000";
+  const codigo = (p: Promise<unknown>) => p.then(() => "sin error", (e: { code?: string }) => e.code);
+
+  test("inscribir en un grupo que no existe", async () => {
+    expect(await codigo(inscribir(await estudiante(), ninguno))).toBe("PT404");
+  });
+  test("cambiar el profesor de un grupo que no existe", async () => {
+    expect(await codigo(llamar(asis, "cambiar_profesor($1, $2, $3)", [ninguno, cat.profesor, "Motivo de prueba"]))).toBe("PT404");
+  });
+  test("anular una inscripción que no existe", async () => {
+    expect(await codigo(llamar(asis, "anular_inscripcion($1, $2)", [ninguno, "Motivo de prueba"]))).toBe("PT404");
+  });
+});
