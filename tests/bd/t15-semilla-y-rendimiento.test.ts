@@ -8,7 +8,7 @@ import { crearBanco, comoUsuario } from "../apoyo/banco";
 import { crearPersona, type Persona } from "../apoyo/escenario";
 import { cargarEstudiantesSinteticos } from "../apoyo/sinteticos";
 
-describe("semilla (009)", () => {
+describe("semilla (009, con los ajustes de la 013)", () => {
   let db: PGlite;
   beforeAll(async () => { ({ db } = await crearBanco(undefined, { semilla: true })); });
   const cuenta = async (sql: string) => (await db.query<{ n: number }>(`select count(*)::int n from ${sql}`)).rows[0].n;
@@ -38,7 +38,9 @@ describe("semilla (009)", () => {
     const r = await db.query<{ programa: string; n: number; max: number }>(
       "select programa, count(*)::int n, max(orden) max from nivel group by programa, publico");
     for (const f of r.rows) expect(f.max, f.programa).toBe(f.n);
-    expect(await cuenta("nivel where programa = 'Principiante'")).toBe(16);
+    // La 013 los reordena en el Curso principal de 16 niveles (spec 002).
+    expect(await cuenta("nivel where programa = 'Curso principal'")).toBe(16);
+    expect(await cuenta("nivel where programa = 'Principiante'")).toBe(0);
   });
 
   test("sin profesores, estudiantes ni cuentas (principio 3)", async () => {

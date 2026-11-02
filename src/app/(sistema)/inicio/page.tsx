@@ -48,6 +48,7 @@ export default async function PaginaInicio({ searchParams }: PageProps<"/inicio"
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Tarea href="/catalogos" titulo="Catálogos" texto="Sucursales, modalidades y horarios, niveles y profesores." />
             <Tarea href="/cuentas" titulo="Cuentas de usuario" texto="Crear cuentas, asignar roles y restablecer contraseñas." />
+            <Tarea href="/reglas" titulo="Regla de aprobación" texto="Nota mínima y Condicionado por programa y nivel." />
           </div>
         </section>
       )}
@@ -55,14 +56,19 @@ export default async function PaginaInicio({ searchParams }: PageProps<"/inicio"
       {es("direccion") && !es("asistente") && (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Tarea href="/estudiantes" titulo="Buscar un estudiante" texto="Consulta de expedientes. Solo lectura." />
-          <Tarea href="/grupos" titulo="Ver los grupos" texto="Grupos abiertos, su profesor y sus inscritos." />
+          <Tarea href="/grupos" titulo="Ver los grupos" texto="Grupos abiertos, su profesor, sus inscritos y su acta." />
+          <Tarea href="/reglas" titulo="Regla de aprobación" texto="Con qué nota se aprueba cada programa y nivel." />
         </div>
       )}
 
       {es("profesor") && (
-        <Alerta tipo="info" titulo="Sus grupos y actas">
-          Aquí podrá registrar las notas de sus grupos y entregar sus actas cuando se habilite la captura académica.
-        </Alerta>
+        <section aria-labelledby="t-prof" className="space-y-3">
+          <h2 id="t-prof" className="text-xs font-semibold tracking-wider text-tinta-suave uppercase">Mis clases</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Tarea href="/mis-grupos" titulo="Registrar notas" texto="Abra su grupo y escriba los parciales; la nota final se calcula sola." />
+            <Tarea href="/mis-grupos" titulo="Entregar un acta" texto="Revise el resumen y entréguela. Después ya no se modifica." />
+          </div>
+        </section>
       )}
     </div>
   );

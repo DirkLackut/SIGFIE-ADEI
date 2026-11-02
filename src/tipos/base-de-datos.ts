@@ -132,6 +132,61 @@ export type Database = {
           },
         ]
       }
+      calificacion: {
+        Row: {
+          aviso_inasistencia: string | null
+          aviso_inasistencia_en: string | null
+          baja_inasistencia: boolean
+          condicionado: boolean
+          inscripcion_id: string
+          justificacion_condicionado: string | null
+          organizacion_id: string
+          version: number
+        }
+        Insert: {
+          aviso_inasistencia?: string | null
+          aviso_inasistencia_en?: string | null
+          baja_inasistencia?: boolean
+          condicionado?: boolean
+          inscripcion_id: string
+          justificacion_condicionado?: string | null
+          organizacion_id?: string
+          version?: number
+        }
+        Update: {
+          aviso_inasistencia?: string | null
+          aviso_inasistencia_en?: string | null
+          baja_inasistencia?: boolean
+          condicionado?: boolean
+          inscripcion_id?: string
+          justificacion_condicionado?: string | null
+          organizacion_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calificacion_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizacion"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calificacion_organizacion_id_inscripcion_id_fkey"
+            columns: ["organizacion_id", "inscripcion_id"]
+            isOneToOne: false
+            referencedRelation: "inscripcion"
+            referencedColumns: ["organizacion_id", "id"]
+          },
+          {
+            foreignKeyName: "calificacion_organizacion_id_inscripcion_id_fkey"
+            columns: ["organizacion_id", "inscripcion_id"]
+            isOneToOne: false
+            referencedRelation: "resultado_academico"
+            referencedColumns: ["organizacion_id", "inscripcion_id"]
+          },
+        ]
+      }
       correlativo: {
         Row: {
           anio: number
@@ -538,6 +593,61 @@ export type Database = {
         }
         Relationships: []
       }
+      parcial: {
+        Row: {
+          condicion: string
+          id: string
+          inscripcion_id: string
+          numero: number
+          organizacion_id: string
+          recibo_reprogramacion: string | null
+          reprogramacion_autorizada: string | null
+          valor: number | null
+        }
+        Insert: {
+          condicion: string
+          id?: string
+          inscripcion_id: string
+          numero: number
+          organizacion_id?: string
+          recibo_reprogramacion?: string | null
+          reprogramacion_autorizada?: string | null
+          valor?: number | null
+        }
+        Update: {
+          condicion?: string
+          id?: string
+          inscripcion_id?: string
+          numero?: number
+          organizacion_id?: string
+          recibo_reprogramacion?: string | null
+          reprogramacion_autorizada?: string | null
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcial_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizacion"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parcial_organizacion_id_inscripcion_id_fkey"
+            columns: ["organizacion_id", "inscripcion_id"]
+            isOneToOne: false
+            referencedRelation: "inscripcion"
+            referencedColumns: ["organizacion_id", "id"]
+          },
+          {
+            foreignKeyName: "parcial_organizacion_id_inscripcion_id_fkey"
+            columns: ["organizacion_id", "inscripcion_id"]
+            isOneToOne: false
+            referencedRelation: "resultado_academico"
+            referencedColumns: ["organizacion_id", "inscripcion_id"]
+          },
+        ]
+      }
       profesor: {
         Row: {
           activo: boolean
@@ -566,6 +676,56 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profesor_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizacion"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regla_aprobacion: {
+        Row: {
+          condicionado_desde: number | null
+          creado_en: string
+          id: string
+          nivel_desde: number
+          nivel_hasta: number
+          nota_condicion: number | null
+          nota_minima: number
+          organizacion_id: string
+          programa: string
+          provisional: boolean
+          vigente_desde: string
+        }
+        Insert: {
+          condicionado_desde?: number | null
+          creado_en?: string
+          id?: string
+          nivel_desde: number
+          nivel_hasta: number
+          nota_condicion?: number | null
+          nota_minima: number
+          organizacion_id?: string
+          programa: string
+          provisional?: boolean
+          vigente_desde: string
+        }
+        Update: {
+          condicionado_desde?: number | null
+          creado_en?: string
+          id?: string
+          nivel_desde?: number
+          nivel_hasta?: number
+          nota_condicion?: number | null
+          nota_minima?: number
+          organizacion_id?: string
+          programa?: string
+          provisional?: boolean
+          vigente_desde?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regla_aprobacion_organizacion_id_fkey"
             columns: ["organizacion_id"]
             isOneToOne: false
             referencedRelation: "organizacion"
@@ -722,12 +882,80 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      resultado_academico: {
+        Row: {
+          aviso_inasistencia: string | null
+          aviso_inasistencia_en: string | null
+          baja_inasistencia: boolean | null
+          condicionado: boolean | null
+          condicionado_desde: number | null
+          considerados: number | null
+          en_franja: boolean | null
+          estado_academico: string | null
+          estado_acta: string | null
+          estado_inscripcion: string | null
+          estudiante_id: string | null
+          excluida: boolean | null
+          faltan: number[] | null
+          fecha_inicio: string | null
+          fecha_inscripcion: string | null
+          fecha_termino: string | null
+          filas: number | null
+          grupo_id: string | null
+          inscripcion_id: string | null
+          justificacion_condicionado: string | null
+          justificados: number | null
+          nivel: string | null
+          nivel_id: string | null
+          nota_condicion: number | null
+          nota_exacta: number | null
+          nota_final: number | null
+          nota_minima: number | null
+          observaciones: string | null
+          orden: number | null
+          organizacion_id: string | null
+          parciales: Json | null
+          posicion: number | null
+          programa: string | null
+          provisional: boolean | null
+          regla_id: string | null
+          regla_provisional: boolean | null
+          requiere_retiro: boolean | null
+          ruta: string | null
+          sin_regla: boolean | null
+          suma: number | null
+          version: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inscripcion_organizacion_id_estudiante_id_fkey"
+            columns: ["organizacion_id", "estudiante_id"]
+            isOneToOne: false
+            referencedRelation: "estudiante"
+            referencedColumns: ["organizacion_id", "id"]
+          },
+          {
+            foreignKeyName: "inscripcion_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizacion"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inscripcion_organizacion_id_grupo_id_fkey"
+            columns: ["organizacion_id", "grupo_id"]
+            isOneToOne: false
+            referencedRelation: "grupo"
+            referencedColumns: ["organizacion_id", "id"]
+          },
+        ]
+      }
     }
     Functions: {
       abrir_grupo: { Args: { p_datos: Json }; Returns: Json }
       acceso_habilitado: { Args: never; Returns: boolean }
       aceptar_aviso: { Args: { p_version: string }; Returns: undefined }
+      acta_del_grupo: { Args: { p_grupo: string }; Returns: Json }
       actualizar_estudiante: {
         Args: { p_datos: Json; p_id: string; p_version: number }
         Returns: Json
@@ -744,6 +972,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      autorizar_reprogramacion: {
+        Args: { p_inscripcion: string; p_numero: number; p_recibo?: string }
+        Returns: Json
+      }
+      avisar_inasistencia: {
+        Args: { p_inscripcion: string; p_observacion: string }
+        Returns: Json
+      }
       aviso_vigente: { Args: { p_organizacion: string }; Returns: string }
       buscar_estudiantes: {
         Args: { p_pagina?: number; p_texto: string }
@@ -752,6 +988,10 @@ export type Database = {
       cambiar_profesor: {
         Args: { p_grupo: string; p_motivo: string; p_profesor: string }
         Returns: undefined
+      }
+      condicionar: {
+        Args: { p_inscripcion: string; p_justificacion: string }
+        Returns: Json
       }
       crear_cuenta: {
         Args: {
@@ -763,20 +1003,54 @@ export type Database = {
         }
         Returns: undefined
       }
+      decidir_salida: {
+        Args: {
+          p_confirmar?: boolean
+          p_decision: string
+          p_inscripcion: string
+          p_motivo: string
+        }
+        Returns: Json
+      }
       desvincular_tutor: {
         Args: { p_estudiante: string; p_tutor: string }
         Returns: undefined
       }
       edad: { Args: { hoy: string; nacimiento: string }; Returns: number }
+      eliminar_regla: { Args: { p_id: string }; Returns: undefined }
+      entregar_acta: {
+        Args: { p_confirmar?: boolean; p_grupo: string }
+        Returns: Json
+      }
+      guardar_parciales: {
+        Args: {
+          p_inscripcion: string
+          p_motivo?: string
+          p_parciales: Json
+          p_version: number
+        }
+        Returns: Json
+      }
+      guardar_regla: { Args: { p_datos: Json }; Returns: Json }
       hoy_managua: { Args: never; Returns: string }
       inscribir: {
-        Args: { p_confirmar?: boolean; p_estudiante: string; p_grupo: string }
+        Args: {
+          p_confirmar?: boolean
+          p_estudiante: string
+          p_grupo: string
+          p_motivo?: string
+        }
         Returns: Json
       }
       mi_estado_acceso: { Args: never; Returns: Json }
       mi_organizacion: { Args: never; Returns: string }
       mi_profesor_id: { Args: never; Returns: string }
+      mis_grupos: { Args: never; Returns: Json }
       normalizar: { Args: { texto: string }; Returns: string }
+      quitar_condicionado: {
+        Args: { p_inscripcion: string; p_motivo: string }
+        Returns: Json
+      }
       registrar_estudiante: {
         Args: { p_confirmar_distinto?: boolean; p_datos: Json }
         Returns: Json

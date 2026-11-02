@@ -6,9 +6,11 @@ import { rpcDeSupabase } from "@/datos/rpc";
 import { inscribir, anularInscripcion, cambiarProfesor, type RespuestaInscripcion } from "@/datos/grupos";
 
 /** CE-54 a CE-57, CE-84, CE-93. */
-export async function accionInscribir(grupoId: string, estudianteId: string, confirmar: boolean): Promise<RespuestaInscripcion> {
+/** 002·CE-54 a CE-56: con antecedentes, la base pide un motivo. */
+export async function accionInscribir(grupoId: string, estudianteId: string, confirmar: boolean,
+                                      motivo: string | null = null): Promise<RespuestaInscripcion> {
   await exigirAcceso(["asistente"]);
-  const r = await inscribir(rpcDeSupabase(await clienteSesion()), estudianteId, grupoId, confirmar);
+  const r = await inscribir(rpcDeSupabase(await clienteSesion()), estudianteId, grupoId, confirmar, motivo);
   if (r.estado === "inscrito") revalidatePath(`/grupos/${grupoId}`);
   return r;
 }

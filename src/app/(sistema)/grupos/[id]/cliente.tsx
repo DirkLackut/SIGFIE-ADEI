@@ -14,6 +14,8 @@ export function Inscribir({ grupoId, inscritos, inicial }: { grupoId: string; in
   const [texto, setTexto] = useState(inicial ?? "");
   const [resultados, setResultados] = useState<FilaBusqueda[] | null>(null);
   const [respuesta, setRespuesta] = useState<{ est: FilaBusqueda; r: RespuestaInscripcion } | null>(null);
+  // 002·CE-54: el motivo se conserva por si después también hay que confirmar una superposición.
+  const [motivo, setMotivo] = useState("");
   const [pendiente, iniciar] = useTransition();
 
   useEffect(() => {
@@ -26,9 +28,12 @@ export function Inscribir({ grupoId, inscritos, inicial }: { grupoId: string; in
     return () => clearTimeout(h);
   }, [texto]);
 
-  const hacer = (est: FilaBusqueda, confirmar = false) => iniciar(async () => {
-    setRespuesta({ est, r: await accionInscribir(grupoId, est.id, confirmar) });
+  const hacer = (est: FilaBusqueda, confirmar = false, conMotivo = motivo) => iniciar(async () => {
+    const r = await accionInscribir(grupoId, est.id, confirmar, conMotivo.trim() || null);
+    setRespuesta({ est, r });
+    if (r.estado === "inscrito") setMotivo("");
   });
+  const elegir = (est: FilaBusqueda) => { setMotivo(""); hacer(est, false, ""); };
 
   const r = respuesta?.r;
   return (
@@ -36,7 +41,22 @@ export function Inscribir({ grupoId, inscritos, inicial }: { grupoId: string; in
       {r && respuesta && (
         r.estado === "inscrito" ? <Alerta tipo="exito">{respuesta.est.nombres} {respuesta.est.apellidos} quedó inscrito.</Alerta>
         : r.estado === "ya_inscrito" ? <Alerta tipo="cuidado">{respuesta.est.nombres} {respuesta.est.apellidos} ya está inscrito en este grupo.</Alerta>
-        : r.estado === "superposicion" ? (
+        : r.estado === "antecedente" ? (
+          <Alerta tipo="cuidado" titulo="Tiene un antecedente en esta ruta de niveles">
+            <ul className="list-disc pl-5">
+              {r.antecedentes.map((a, i) => <li key={i}>{a.tipo === "reprobado"
+                ? `Reprobó ${a.nivel} (${a.codigo_grupo}) con ${a.nota_final}.`
+                : `Tuvo un Condicionado en ${a.nivel} y en ${a.nivel_siguiente} sacó ${a.nota_siguiente}; se le exigía ${a.nota_exigida}.`}</li>)}
+            </ul>
+            <p className="mt-1">El sistema no cambia su nivel: decide usted. Para inscribirlo, escriba el motivo.</p>
+            <div className="mt-2 flex flex-wrap items-end gap-2">
+              <input aria-label="Motivo" value={motivo} onChange={(e) => setMotivo(e.target.value)} maxLength={200}
+                     className="campo-entrada max-w-sm" placeholder="Por ejemplo: autorizado por la secretaría" />
+              <button className={claseBoton("cuidado")} disabled={pendiente || motivo.trim().length < 5} onClick={() => hacer(respuesta.est)}>Inscribir con este motivo</button>
+              <button className={claseBoton("secundario")} onClick={() => setRespuesta(null)}>No inscribir</button>
+            </div>
+          </Alerta>
+        ) : r.estado === "superposicion" ? (
           <Alerta tipo="cuidado" titulo="Se cruza con otro grupo">
             <p>{respuesta.est.nombres} {respuesta.est.apellidos} ya cursa {r.grupos.map((g) => g.codigo_grupo).join(", ")} en la misma modalidad, con fechas y horas que se cruzan.</p>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -60,7 +80,7 @@ export function Inscribir({ grupoId, inscritos, inicial }: { grupoId: string; in
                   {f.estado_matricula !== "Activo" && <span className="text-tinta-suave"> ({f.estado_matricula})</span>}</span>
                 {inscritos.includes(f.id)
                   ? <span className="text-sm font-semibold text-cian">✓ Ya inscrito</span>
-                  : <button className={claseBoton("primario")} disabled={pendiente} onClick={() => hacer(f)}>Inscribir</button>}
+                  : <button className={claseBoton("primario")} disabled={pendiente} onClick={() => elegir(f)}>Inscribir</button>}
               </li>
             ))}
           </ul>

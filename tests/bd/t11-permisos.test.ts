@@ -81,10 +81,12 @@ describe("reglas generales", () => {
       `select distinct p.proname f from pg_proc p where p.pronamespace = 'public'::regnamespace
          and has_function_privilege('authenticated', p.oid, 'execute') order by 1`);
     expect(r.rows.map((x) => x.f)).toEqual([
-      "abrir_grupo", "acceso_habilitado", "aceptar_aviso", "actualizar_estudiante",
-      "anular_inscripcion", "asignar_roles", "buscar_estudiantes", "cambiar_profesor", "crear_cuenta", "desvincular_tutor",
-      "edad", "hoy_managua", "inscribir", "mi_estado_acceso", "mi_organizacion", "mi_profesor_id",
-      "normalizar", "registrar_estudiante", "registrar_evento", "tiene_rol", "vincular_tutor",
+      "abrir_grupo", "acceso_habilitado", "aceptar_aviso", "acta_del_grupo", "actualizar_estudiante",
+      "anular_inscripcion", "asignar_roles", "autorizar_reprogramacion", "avisar_inasistencia",
+      "buscar_estudiantes", "cambiar_profesor", "condicionar", "crear_cuenta", "decidir_salida", "desvincular_tutor",
+      "edad", "eliminar_regla", "entregar_acta", "guardar_parciales", "guardar_regla",
+      "hoy_managua", "inscribir", "mi_estado_acceso", "mi_organizacion", "mi_profesor_id", "mis_grupos",
+      "normalizar", "quitar_condicionado", "registrar_estudiante", "registrar_evento", "tiene_rol", "vincular_tutor",
     ]);
   });
 
@@ -92,8 +94,19 @@ describe("reglas generales", () => {
     const r = await db.query<{ f: string }>(
       `select p.proname f from pg_proc p where p.pronamespace = 'interno'::regnamespace order by 1`);
     expect(r.rows.map((x) => x.f)).toEqual([
-      "anotar_motivo", "candidatos_mismo_estudiante", "escapar_like", "estudiantes_que_coinciden",
-      "exigir_asistente", "exigir_motivo",
+      "anotar_motivo", "antecedentes", "candidatos_mismo_estudiante", "contexto", "es_profesor_del_grupo",
+      "escapar_like", "estudiantes_que_coinciden", "exigir_acceso", "exigir_asistente", "exigir_motivo",
+      "posicion", "resultado", "resumen_acta", "ruta", "tocar",
+    ]);
+    // Las de la 008 (sus operaciones corren con los permisos de quien llama) y, de
+    // la 012, solo las que usan inscribir y la vista resultado_academico
+    // (security_invoker). Las demás de la 012 solo las llaman funciones SECURITY DEFINER.
+    const usuario = await db.query<{ f: string }>(
+      `select p.proname f from pg_proc p where p.pronamespace = 'interno'::regnamespace
+         and has_function_privilege('authenticated', p.oid, 'execute') order by 1`);
+    expect(usuario.rows.map((x) => x.f)).toEqual([
+      "anotar_motivo", "antecedentes", "candidatos_mismo_estudiante", "escapar_like", "estudiantes_que_coinciden",
+      "exigir_asistente", "exigir_motivo", "posicion", "ruta",
     ]);
     const anon = await db.query<{ n: number }>(
       `select count(*)::int n from pg_proc p where p.pronamespace = 'interno'::regnamespace

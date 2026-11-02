@@ -62,20 +62,37 @@ if (!(await q("select 1 from usuario where nombre_usuario = 'otra.asistente'")).
   await q("insert into usuario (id, organizacion_id, nombre_usuario) values ($1,$2,'otra.asistente')", [a.id, otra.id]);
   await q("insert into usuario_rol values ($1,$2,'asistente')", [otra.id, a.id]);
 }
-// Aura con clave conocida
-const [aura] = await q("select id from usuario where nombre_usuario = 'aura.gomez'");
-await admin.auth.admin.updateUserById(aura.id, { password: CLAVE });
+// Las cuatro cuentas con la clave conocida de la copia local (pudieron crearse antes,
+// en el recorrido de pantallas, con otra).
+for (const u of await q("select id from usuario where nombre_usuario in ('aura.gomez','carla.mena','otra.asistente','diana.direccion')"))
+  await admin.auth.admin.updateUserById(u.id, { password: CLAVE });
 await q("update usuario set debe_cambiar_contrasena = false where nombre_usuario in ('aura.gomez','carla.mena','otra.asistente','diana.direccion')");
 const correo = async (u) => (await q("select a.email from auth.users a join usuario u on u.id = a.id where u.nombre_usuario = $1", [u]))[0].email;
 const [estOtra] = await q("select id from estudiante where organizacion_id = $1", [otra.id]);
 const [estAdei] = await q("select id from estudiante where organizacion_id = $1 order by codigo_adei limit 1", [adei.id]);
 const [grupo] = await q("select g.id from grupo g join profesor p on p.id = g.profesor_id where g.organizacion_id = $1 and p.nombres = 'Carla' limit 1", [adei.id]);
 const [grupoAjeno] = await q("select g.id from grupo g join profesor p on p.id = g.profesor_id where p.nombres = 'PRUEBA Luis'");
+// Spec 002: un acta propia abierta, otra ya entregada, una inscripción en un grupo
+// ajeno y una regla confirmada. Todo sintético.
+const [nivel6] = await q("select id from nivel where organizacion_id = $1 and programa = 'Curso principal' and orden = 6", [adei.id]);
+const [base] = await q("select horario_id, sucursal_id from grupo where organizacion_id = $1 limit 1", [adei.id]);
+const nuevoGrupo = async (profesorId) => (await q(`insert into grupo (organizacion_id, nivel_id, horario_id, profesor_id, sucursal_id, fecha_inicio, fecha_termino)
+  values ($1,$2,$3,$4,$5, current_date - 5, current_date + 40) returning id`, [adei.id, nivel6.id, base.horario_id, profesorId, base.sucursal_id]))[0].id;
+const inscribirEn = async (grupoId) => (await q("insert into inscripcion (organizacion_id, estudiante_id, grupo_id) values ($1,$2,$3) returning id",
+  [adei.id, estAdei.id, grupoId]))[0].id;
+const [luis002] = await q("select id from profesor where organizacion_id = $1 and nombres = 'PRUEBA Luis'", [adei.id]);
+const grupoPropio = await nuevoGrupo(carla.id), grupoEntregado = await nuevoGrupo(carla.id), grupoAjeno002 = await nuevoGrupo(luis002.id);
+const inscPropia = await inscribirEn(grupoPropio), inscAjena = await inscribirEn(grupoAjeno002), inscEntregada = await inscribirEn(grupoEntregado);
+for (const n of [1, 2, 3]) await q("insert into parcial (organizacion_id, inscripcion_id, numero, condicion, valor) values ($1,$2,$3,'Registrado',85)", [adei.id, inscEntregada, n]);
+await q("update grupo set estado_acta = 'Entregada', fecha_entrega_acta = now() where id = $1", [grupoEntregado]);
+const [reglaConfirmada] = await q("select id from regla_aprobacion where organizacion_id = $1 and not provisional limit 1", [adei.id]);
 const valores = {
   app: "http://127.0.0.1:3000", api: env.NEXT_PUBLIC_SUPABASE_URL.replace("localhost", "127.0.0.1"), anon: env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   correo_asistente: await correo("aura.gomez"), correo_profesor: await correo("carla.mena"), correo_otra: await correo("otra.asistente"), correo_direccion: await correo("diana.direccion"), grupo_ajeno: grupoAjeno.id,
   clave: CLAVE, org_otra: otra.id, org_adei: adei.id, estudiante_otra: estOtra.id, estudiante_adei: estAdei.id, grupo_adei: grupo.id,
   service_key_fragmento: env.SUPABASE_SERVICE_ROLE_KEY.split(".")[2].slice(0, 20),
+  grupo_propio_002: grupoPropio, grupo_ajeno_002: grupoAjeno002, insc_propia: inscPropia, insc_ajena: inscAjena,
+  insc_entregada: inscEntregada, regla_confirmada: reglaConfirmada.id,
 };
 fs.writeFileSync("entorno-local.json", JSON.stringify({
   name: "SIGFIE local (sintético)", values: Object.entries(valores).map(([key, value]) => ({ key, value, enabled: true })) }, null, 2));

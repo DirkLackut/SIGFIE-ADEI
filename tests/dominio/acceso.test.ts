@@ -53,6 +53,25 @@ describe("decidirRuta", () => {
     expect(decidirRuta(estado(), "/cuentas")).toEqual(sigue);
   });
 
+  test("002·CE-1 · «Mis grupos» es solo del profesor", () => {
+    expect(puedeAbrir(["profesor"], "/mis-grupos")).toBe(true);
+    expect(puedeAbrir(["profesor"], "/mis-grupos/abc")).toBe(true);
+    expect(puedeAbrir(["asistente"], "/mis-grupos")).toBe(false);
+    expect(puedeAbrir(["direccion"], "/mis-grupos")).toBe(false);
+    expect(puedeAbrir(["asistente", "profesor"], "/mis-grupos")).toBe(true);   // L2: los permisos se suman
+  });
+
+  test("002·CE-50 · el acta impresa la abren los tres roles (la base decide qué grupo)", () => {
+    for (const r of ["profesor", "asistente", "direccion"] as Rol[]) expect(puedeAbrir([r], "/actas/abc/imprimir")).toBe(true);
+    expect(puedeAbrir(["admin_tecnico"], "/actas/abc/imprimir")).toBe(false);
+  });
+
+  test("002·CE-25, CE-58 · la regla de aprobación: la Asistente la registra y Dirección la consulta", () => {
+    expect(puedeAbrir(["asistente"], "/reglas")).toBe(true);
+    expect(puedeAbrir(["direccion"], "/reglas")).toBe(true);
+    expect(puedeAbrir(["profesor"], "/reglas")).toBe(false);
+  });
+
   test("CE-2 · con varios roles se suman los permisos", () => {
     expect(puedeAbrir(["direccion", "profesor"], "/estudiantes/abc")).toBe(true);
     expect(puedeAbrir(["profesor"], "/estudiantes/abc")).toBe(false);

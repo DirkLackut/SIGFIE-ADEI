@@ -323,6 +323,73 @@ const a10 = carpeta("A10 · Errores y excepciones", [
   }),
 ], "Que un dato inesperado termine en un mensaje claro y no en una caída o una traza.");
 
+
+// ---------------------------------------------------------------------------
+// 002 · Captura académica (spec 002, CE-4, CE-11, CE-35, CE-47, CE-57, CE-59, CE-60)
+// ---------------------------------------------------------------------------
+const rpc = (f) => `{{api}}/rest/v1/rpc/${f}`;
+const parciales = (insc, lista, extra = {}) => ({ p_inscripcion: insc, p_parciales: lista, p_version: 0, ...extra });
+const unParcial = (condicion, valor) => [{ numero: 1, condicion, valor }];
+const c002 = carpeta("002 · Captura académica", [
+  pet("Profesor: el acta de un grupo ajeno responde «denegado» (CE-4)", "POST", rpc("acta_del_grupo"), {
+    headers: api("{{tok_profesor}}"), body: json({ p_grupo: "{{grupo_ajeno_002}}" }),
+    pruebas: `
+pm.test("Responde 200 con estado denegado", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: "denegado" }); });
+pm.test("No trae filas ni nombres", () => pm.expect(pm.response.text()).to.not.include("codigo_adei"));`,
+  }),
+  pet("Profesor: su propia acta sí la ve, sin cédula ni teléfono (CE-5)", "POST", rpc("acta_del_grupo"), {
+    headers: api("{{tok_profesor}}"), body: json({ p_grupo: "{{grupo_propio_002}}" }),
+    pruebas: `
+pm.test("Responde ok", () => pm.expect(pm.response.json().estado).to.eql("ok"));
+pm.test("Sin datos personales de más", () => pm.expect(pm.response.text()).to.not.match(/"(cedula|telefono|fecha_nacimiento|correo|direccion)"/));`,
+  }),
+  rechazado("Profesor no guarda parciales de un grupo ajeno (CE-11)", "POST", rpc("guardar_parciales"), "{{tok_profesor}}",
+    parciales("{{insc_ajena}}", unParcial("Registrado", 100))),
+  rechazado("Profesor no modifica un acta entregada (CE-47)", "POST", rpc("guardar_parciales"), "{{tok_profesor}}",
+    parciales("{{insc_entregada}}", unParcial("Registrado", 100))),
+  rechazado("Profesor no pone Reprogramado sin autorización (CE-35)", "POST", rpc("guardar_parciales"), "{{tok_profesor}}",
+    parciales("{{insc_propia}}", unParcial("Reprogramado", 90))),
+  rechazado("Una nota de 101 se rechaza (CE-8)", "POST", rpc("guardar_parciales"), "{{tok_profesor}}",
+    parciales("{{insc_propia}}", unParcial("Registrado", 101))),
+  rechazado("Una nota con decimales se rechaza (CE-8)", "POST", rpc("guardar_parciales"), "{{tok_profesor}}",
+    parciales("{{insc_propia}}", unParcial("Registrado", 85.5))),
+  rechazado("Texto con SQL en la nota se rechaza (A05)", "POST", rpc("guardar_parciales"), "{{tok_profesor}}",
+    parciales("{{insc_propia}}", unParcial("Registrado", "85; delete from parcial")),
+    `\npm.test("La tabla sigue ahí: no se ejecutó nada", () => pm.expect(pm.response.text()).to.not.match(/DELETE \\d/));`),
+  rechazado("Una condición inventada se rechaza", "POST", rpc("guardar_parciales"), "{{tok_profesor}}",
+    parciales("{{insc_propia}}", unParcial("Aprobado por mí", null)),
+    `\npm.test("No devuelve la fila rechazada", () => pm.expect(pm.response.text()).to.not.include("Failing row"));`),
+  rechazado("La Asistente no captura con el acta abierta (A3)", "POST", rpc("guardar_parciales"), "{{tok_asistente}}",
+    parciales("{{insc_propia}}", unParcial("Registrado", 100))),
+  rechazado("Dirección no guarda parciales (CE-57)", "POST", rpc("guardar_parciales"), "{{tok_direccion}}",
+    parciales("{{insc_entregada}}", unParcial("Registrado", 100), { p_motivo: "Intento de Dirección" })),
+  rechazado("Dirección no condiciona (CE-57)", "POST", rpc("condicionar"), "{{tok_direccion}}",
+    { p_inscripcion: "{{insc_propia}}", p_justificacion: "Intento de Dirección" }),
+  rechazado("Dirección no registra reglas (CE-57)", "POST", rpc("guardar_regla"), "{{tok_direccion}}",
+    { p_datos: { programa: "Conversation", nivel_desde: 1, nivel_hasta: 99, vigente_desde: "2099-01-01", nota_minima: 50, provisional: true } }),
+  rechazado("Dirección no entrega actas (CE-57)", "POST", rpc("entregar_acta"), "{{tok_direccion}}",
+    { p_grupo: "{{grupo_propio_002}}", p_confirmar: true }),
+  rechazado("El profesor no autoriza reprogramaciones (Q1)", "POST", rpc("autorizar_reprogramacion"), "{{tok_profesor}}",
+    { p_inscripcion: "{{insc_propia}}", p_numero: 1, p_recibo: null }),
+  rechazado("Una regla confirmada no se borra (CE-28)", "POST", rpc("eliminar_regla"), "{{tok_asistente}}",
+    { p_id: "{{regla_confirmada}}" }),
+  rechazado("Nadie escribe directo en la tabla parcial (D26)", "POST", "{{api}}/rest/v1/parcial", "{{tok_profesor}}",
+    { inscripcion_id: "{{insc_propia}}", numero: 1, condicion: "Registrado", valor: 100 }),
+  pet("Nadie cambia directo una calificación (D26)", "PATCH", "{{api}}/rest/v1/calificacion?inscripcion_id=eq.{{insc_entregada}}", {
+    headers: [...api("{{tok_asistente}}"), { key: "Prefer", value: "return=representation" }], body: json({ condicionado: true }),
+    pruebas: `pm.test("No cambia ninguna fila", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });`,
+  }),
+  vacio("Profesor no lee los parciales de un grupo ajeno (CE-58)", "{{api}}/rest/v1/parcial?inscripcion_id=eq.{{insc_ajena}}&select=valor", "{{tok_profesor}}"),
+  vacio("Profesor no lee el resultado de un grupo ajeno (CE-58)", "{{api}}/rest/v1/resultado_academico?inscripcion_id=eq.{{insc_ajena}}&select=nota_final", "{{tok_profesor}}"),
+  vacio("Otra organización no lee los parciales de ADEI (CE-59)", "{{api}}/rest/v1/parcial?inscripcion_id=eq.{{insc_entregada}}&select=valor", "{{tok_otra}}"),
+  pet("Otra organización: el acta de ADEI «no existe» (404, CE-59)", "POST", rpc("acta_del_grupo"), {
+    headers: api("{{tok_otra}}"), body: json({ p_grupo: "{{grupo_propio_002}}" }),
+    pruebas: `pm.test("Responde 404", () => pm.response.to.have.status(404)); pm.test("Sin trazas", () => pm.expect(pm.response.text()).to.not.match(/stack|node_modules/i));`,
+  }),
+  rechazado("Sin sesión no hay «Mis grupos»", "POST", rpc("mis_grupos"), "{{anon}}", {}),
+  vacio("Sin sesión no se lee la regla de aprobación", "{{api}}/rest/v1/regla_aprobacion?select=id", "{{anon}}"),
+], "Que la captura académica respete rol, grupo, estado del acta y organización aunque la petición no pase por la interfaz (CE-60).");
+
 const coleccion = {
   info: {
     name: "SIGFIE-ADEI · Pruebas de seguridad (OWASP Top 10:2025)",
@@ -343,7 +410,7 @@ const coleccion = {
       pruebas: `pm.test("La Asistente ve su sucursal central", () => pm.expect(pm.response.json()).to.have.lengthOf(1)); pm.collectionVariables.set("sucursal_adei", pm.response.json()[0].id);`,
     })],
     "Inicia sesión con cuatro cuentas sintéticas: Asistente, Profesor y Dirección de ADEI, y la Asistente de una organización ficticia."),
-    a01, a02, a04, a05, a07, a09, a10],
+    a01, a02, a04, a05, a07, a09, a10, c002],
 };
 fs.writeFileSync(process.argv[2] ?? "sigfie-seguridad.postman_collection.json", JSON.stringify(coleccion, null, 2));
 console.log("pruebas:", JSON.stringify(coleccion).match(/pm\.test\(/g).length);

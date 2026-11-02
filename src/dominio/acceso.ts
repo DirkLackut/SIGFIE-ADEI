@@ -42,6 +42,9 @@ const SECCIONES: { prefijo: string; roles: Rol[] }[] = [
   { prefijo: "/grupos/nuevo", roles: ["asistente"] },
   { prefijo: "/estudiantes", roles: ["asistente", "direccion"] },   // CE-46
   { prefijo: "/grupos", roles: ["asistente", "direccion"] },
+  { prefijo: "/mis-grupos", roles: ["profesor"] },                        // 002·CE-1
+  { prefijo: "/reglas", roles: ["asistente", "direccion"] },              // 002·CE-25, CE-58
+  { prefijo: "/actas", roles: ["asistente", "direccion", "profesor"] },   // 002·CE-50: la base decide qué grupo
 ];
 
 const empiezaCon = (ruta: string, prefijo: string) => ruta === prefijo || ruta.startsWith(prefijo + "/");
