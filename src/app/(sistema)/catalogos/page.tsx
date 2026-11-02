@@ -123,6 +123,8 @@ export default async function PaginaCatalogos({ searchParams }: PageProps<"/cata
             {p.texto}
           </Link>
         ))}
+        {/* 002·CE-25: la regla vive en su propia página porque Dirección también la consulta (CE-58). */}
+        <Link href="/reglas" className="rounded-md px-3 py-1.5 text-sm font-semibold text-tinta-suave hover:bg-papel-alt">Regla de aprobación →</Link>
       </nav>
       <div className="space-y-5">{contenido}</div>
     </>

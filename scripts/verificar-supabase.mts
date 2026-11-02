@@ -28,10 +28,12 @@ if (!URL_BD || URL_BD.includes("[YOUR-PASSWORD]")) {
 // Funciones que un usuario con sesión puede ejecutar. Es la misma lista que vigila
 // tests/bd/t11-permisos.test.ts: si se cambia una, se cambia la otra.
 const FUNCIONES_DE_USUARIO = [
-  "abrir_grupo", "acceso_habilitado", "aceptar_aviso", "actualizar_estudiante",
-  "anular_inscripcion", "asignar_roles", "buscar_estudiantes", "cambiar_profesor", "crear_cuenta", "desvincular_tutor",
-  "edad", "hoy_managua", "inscribir", "mi_estado_acceso", "mi_organizacion", "mi_profesor_id",
-  "normalizar", "registrar_estudiante", "registrar_evento", "tiene_rol", "vincular_tutor",
+  "abrir_grupo", "acceso_habilitado", "aceptar_aviso", "acta_del_grupo", "actualizar_estudiante",
+  "anular_inscripcion", "asignar_roles", "autorizar_reprogramacion", "avisar_inasistencia",
+  "buscar_estudiantes", "cambiar_profesor", "condicionar", "crear_cuenta", "decidir_salida", "desvincular_tutor",
+  "edad", "eliminar_regla", "entregar_acta", "guardar_parciales", "guardar_regla",
+  "hoy_managua", "inscribir", "mi_estado_acceso", "mi_organizacion", "mi_profesor_id", "mis_grupos",
+  "normalizar", "quitar_condicionado", "registrar_estudiante", "registrar_evento", "tiene_rol", "vincular_tutor",
 ];
 // Las migraciones que deben estar aplicadas son las del repositorio: así esta lista
 // no se queda atrás cuando se agrega una nueva.

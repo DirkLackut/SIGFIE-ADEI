@@ -2347,6 +2347,988 @@
           ]
         }
       ]
+    },
+    {
+      "name": "002 · Captura académica",
+      "description": "Que la captura académica respete rol, grupo, estado del acta y organización aunque la petición no pase por la interfaz (CE-60).",
+      "item": [
+        {
+          "name": "Profesor: el acta de un grupo ajeno responde «denegado» (CE-4)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/acta_del_grupo",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_grupo\":\"{{grupo_ajeno_002}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });",
+                  "pm.test(\"No trae filas ni nombres\", () => pm.expect(pm.response.text()).to.not.include(\"codigo_adei\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor: su propia acta sí la ve, sin cédula ni teléfono (CE-5)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/acta_del_grupo",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_grupo\":\"{{grupo_propio_002}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde ok\", () => pm.expect(pm.response.json().estado).to.eql(\"ok\"));",
+                  "pm.test(\"Sin datos personales de más\", () => pm.expect(pm.response.text()).to.not.match(/\"(cedula|telefono|fecha_nacimiento|correo|direccion)\"/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no guarda parciales de un grupo ajeno (CE-11)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_ajena}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Registrado\",\"valor\":100}],\"p_version\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no modifica un acta entregada (CE-47)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_entregada}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Registrado\",\"valor\":100}],\"p_version\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no pone Reprogramado sin autorización (CE-35)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Reprogramado\",\"valor\":90}],\"p_version\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una nota de 101 se rechaza (CE-8)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Registrado\",\"valor\":101}],\"p_version\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una nota con decimales se rechaza (CE-8)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Registrado\",\"valor\":85.5}],\"p_version\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Texto con SQL en la nota se rechaza (A05)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Registrado\",\"valor\":\"85; delete from parcial\"}],\"p_version\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));",
+                  "pm.test(\"La tabla sigue ahí: no se ejecutó nada\", () => pm.expect(pm.response.text()).to.not.match(/DELETE \\d/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una condición inventada se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Aprobado por mí\",\"valor\":null}],\"p_version\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));",
+                  "pm.test(\"No devuelve la fila rechazada\", () => pm.expect(pm.response.text()).to.not.include(\"Failing row\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La Asistente no captura con el acta abierta (A3)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Registrado\",\"valor\":100}],\"p_version\":0}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no guarda parciales (CE-57)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_parciales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_entregada}}\",\"p_parciales\":[{\"numero\":1,\"condicion\":\"Registrado\",\"valor\":100}],\"p_version\":0,\"p_motivo\":\"Intento de Dirección\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no condiciona (CE-57)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/condicionar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\",\"p_justificacion\":\"Intento de Dirección\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no registra reglas (CE-57)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/guardar_regla",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"programa\":\"Conversation\",\"nivel_desde\":1,\"nivel_hasta\":99,\"vigente_desde\":\"2099-01-01\",\"nota_minima\":50,\"provisional\":true}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no entrega actas (CE-57)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/entregar_acta",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_grupo\":\"{{grupo_propio_002}}\",\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El profesor no autoriza reprogramaciones (Q1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/autorizar_reprogramacion",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\",\"p_numero\":1,\"p_recibo\":null}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una regla confirmada no se borra (CE-28)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/eliminar_regla",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_id\":\"{{regla_confirmada}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nadie escribe directo en la tabla parcial (D26)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/parcial",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"inscripcion_id\":\"{{insc_propia}}\",\"numero\":1,\"condicion\":\"Registrado\",\"valor\":100}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nadie cambia directo una calificación (D26)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "url": "{{api}}/rest/v1/calificacion?inscripcion_id=eq.{{insc_entregada}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"condicionado\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cambia ninguna fila\", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no lee los parciales de un grupo ajeno (CE-58)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/parcial?inscripcion_id=eq.{{insc_ajena}}&select=valor"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor no lee el resultado de un grupo ajeno (CE-58)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/resultado_academico?inscripcion_id=eq.{{insc_ajena}}&select=nota_final"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización no lee los parciales de ADEI (CE-59)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/parcial?inscripcion_id=eq.{{insc_entregada}}&select=valor"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: el acta de ADEI «no existe» (404, CE-59)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/acta_del_grupo",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_grupo\":\"{{grupo_propio_002}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 404\", () => pm.response.to.have.status(404)); pm.test(\"Sin trazas\", () => pm.expect(pm.response.text()).to.not.match(/stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin sesión no hay «Mis grupos»",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/mis_grupos",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin sesión no se lee la regla de aprobación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/regla_aprobacion?select=id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No devuelve filas\", () => {",
+                  "  if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.an(\"array\").that.is.empty;",
+                  "  else pm.expect(pm.response.code).to.be.oneOf([401, 403]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

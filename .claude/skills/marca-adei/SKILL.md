@@ -79,15 +79,17 @@ Usa las skills `emil-design-eng` y `review-animations` para el detalle. Lo esenc
 - Con «reducir movimiento» del sistema no hay animación: ya está resuelto en
   globals.css y en `MotionConfig`.
 
-## Impresos (actas, spec 003)
+## Impresos (acta: spec 002; hoja de matrícula: spec 003)
 
-Siguen el formato oficial **«Hoja de registro de notas»** de ADEI:
+Fotos de referencia y decisiones en `docs/formatos/README.md`. El acta sigue el
+formato oficial **«Hoja de registro de notas»** de ADEI:
 
 - emblema arriba a la izquierda y marca de agua grande centrada;
 - encabezado *English Teaching Academy / Academia de Enseñanza en Inglés*;
 - datos del grupo: Inicio, Término, Nivel, Horario y Profesor;
 - tabla N.º / Nombres y apellidos / I / II / III / Final, con 20 filas;
-- al pie, «Entregado» y «Firma del profesor»;
+- al pie, «Entregado» y «Firma del profesor», y la nota «Favor no realizar
+  enmiendas ni borrones, indicar en rojo las notas reprobadas»;
 - las notas reprobadas en `reprobado`.
 
 Se imprime a color o en gris: el emblema funciona en los dos (versión «Gris» del

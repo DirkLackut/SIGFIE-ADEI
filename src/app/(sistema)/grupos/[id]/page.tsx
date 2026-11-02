@@ -4,8 +4,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirAcceso } from "@/servidor/sesion";
 import { clienteSesion } from "@/servidor/supabase";
-import { Alerta, Dato, Insignia, Seccion, Tabla, TituloPagina } from "@/componentes/ui";
-import { cantidad, esCodigoAdei, esUuid, fecha, hora } from "@/dominio/formato";
+import { Alerta, BotonEnlace, Dato, Insignia, Seccion, Tabla, TituloPagina } from "@/componentes/ui";
+import { cantidad, esCodigoAdei, esUuid, fecha, fechaHora, hora } from "@/dominio/formato";
+import { rpcDeSupabase } from "@/datos/rpc";
+import { actaDelGrupo } from "@/datos/actas";
+import { ActaEnPantalla, TablaResumen } from "@/componentes/acta";
 import { hoyEnManagua } from "@/dominio/edad";
 import { Anular, CambiarProfesor, Inscribir } from "./cliente";
 import { Desplegable } from "@/componentes/movimiento";
@@ -24,10 +27,11 @@ export default async function PaginaGrupo({ params, searchParams }: PageProps<"/
   if (!esUuid(id)) notFound();
   const { abierto, inscribir } = await searchParams;
   const s = await clienteSesion();
-  const [{ data }, { data: inscritos }, { data: profesores }] = await Promise.all([
+  const [{ data }, { data: inscritos }, { data: profesores }, acta] = await Promise.all([
     s.from("grupo").select("id, codigo_grupo, fecha_inicio, fecha_termino, estado_acta, profesor_id, nivel(nombre, programa), profesor(nombres, apellidos), sucursal(nombre), horario(hora_inicio, hora_fin, modalidad(nombre, dias_de_clase))").eq("id", id).maybeSingle(),
     s.from("inscripcion").select("id, fecha_inscripcion, estado_inscripcion, estudiante(id, codigo_adei, nombres, apellidos)").eq("grupo_id", id).order("fecha_inscripcion"),
     s.from("profesor").select("id, nombres, apellidos").eq("activo", true).order("apellidos"),
+    actaDelGrupo(rpcDeSupabase(s), id),
   ]);
   if (!data) notFound();
   const g = data as unknown as Grupo;
@@ -76,6 +80,20 @@ export default async function PaginaGrupo({ params, searchParams }: PageProps<"/
             `${i.estudiante.apellidos}, ${i.estudiante.nombres}`, fecha(i.fecha_inscripcion), i.estado_inscripcion,
             ...(editable ? [<Anular key="a" grupoId={g.id} inscripcionId={i.id} />] : [])])} />
       </Seccion>
+
+      {/* 002·CE-29 a CE-41, CE-48, CE-49, CE-58: el acta, para la Asistente y Dirección. */}
+      {acta.estado === "ok" && (
+        <Seccion titulo="Acta" descripcion={g.estado_acta === "Entregada"
+            ? `Entregada el ${fechaHora(acta.grupo.fecha_entrega_acta)}.${asistente ? " Puede corregir un parcial con un motivo." : ""}`
+            : "Las notas las registra el profesor del grupo."}
+          acciones={<BotonEnlace estilo="secundario" href={`/actas/${g.id}/imprimir` as Route}>Imprimir o guardar en PDF</BotonEnlace>}>
+          <div className="space-y-4">
+            <TablaResumen resumen={acta.resumen} />
+            <ActaEnPantalla acta={acta} modo={asistente ? "asistente" : "lectura"} />
+          </div>
+        </Seccion>
+      )}
+      {acta.estado === "error" && <Alerta tipo="cuidado">No se pudo cargar el acta: {acta.mensaje}</Alerta>}
     </div>
   );
 }

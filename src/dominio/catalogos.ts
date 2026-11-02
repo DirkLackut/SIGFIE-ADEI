@@ -6,8 +6,13 @@
 import { normalizar, limpiarEspacios, validarNombre } from "./texto";
 
 export type Entidad = "sucursal" | "modalidad" | "horario" | "nivel" | "profesor";
-export const PROGRAMAS = ["Principiante", "Beginners", "Intermediate", "Conversation", "Conversation Avanzada", "Advanced", "Especial"] as const;
-export const PUBLICOS = ["Adultos", "Niños"] as const;
+/** Los que se ofrecen para un nivel nuevo (spec 002: Curso principal de 16 niveles
+ *  y Curso de niños aparte). */
+export const PROGRAMAS = ["Curso principal", "Conversation", "Conversation Avanzada", "Especial", "Curso de niños"] as const;
+/** Los de antes de la 013: ya no se ofrecen, pero un nivel antiguo que los tiene se
+ *  puede seguir editando (la base también los acepta). */
+const PROGRAMAS_ANTERIORES = ["Principiante", "Beginners", "Intermediate", "Advanced"];
+export const PUBLICOS = ["Todos", "Adultos", "Niños"] as const;
 
 export const CAMPOS: Record<Entidad, string[]> = {
   sucursal: ["nombre", "direccion", "telefono"],
@@ -51,7 +56,8 @@ export function revisarCatalogo(entidad: Entidad, v: Valores): Revision {
       break;
     case "nivel": {
       texto("codigo", 1, 10, "De 1 a 10 caracteres, por ejemplo INT-11."); texto("nombre", 2, 60, "De 2 a 60 caracteres.");
-      if (!PROGRAMAS.includes(v.programa as never)) e.programa = "Elija el programa."; else d.programa = v.programa;
+      if (!PROGRAMAS.includes(v.programa as never) && !PROGRAMAS_ANTERIORES.includes(v.programa)) e.programa = "Elija el programa.";
+      else d.programa = v.programa;
       if (!PUBLICOS.includes(v.publico as never)) e.publico = "Elija el público."; else d.publico = v.publico;
       const n = Number(v.orden);
       if (!Number.isInteger(n) || n < 1 || n > 99) e.orden = "Un número del 1 al 99: su lugar dentro del programa."; else d.orden = n;

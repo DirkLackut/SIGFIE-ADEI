@@ -573,6 +573,56 @@ export type Database = {
           },
         ]
       }
+      regla_aprobacion: {
+        Row: {
+          condicionado_desde: number | null
+          creado_en: string
+          id: string
+          nivel_desde: number
+          nivel_hasta: number
+          nota_condicion: number | null
+          nota_minima: number
+          organizacion_id: string
+          programa: string
+          provisional: boolean
+          vigente_desde: string
+        }
+        Insert: {
+          condicionado_desde?: number | null
+          creado_en?: string
+          id?: string
+          nivel_desde: number
+          nivel_hasta: number
+          nota_condicion?: number | null
+          nota_minima: number
+          organizacion_id?: string
+          programa: string
+          provisional?: boolean
+          vigente_desde: string
+        }
+        Update: {
+          condicionado_desde?: number | null
+          creado_en?: string
+          id?: string
+          nivel_desde?: number
+          nivel_hasta?: number
+          nota_condicion?: number | null
+          nota_minima?: number
+          organizacion_id?: string
+          programa?: string
+          provisional?: boolean
+          vigente_desde?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regla_aprobacion_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizacion"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sucursal: {
         Row: {
           direccion: string

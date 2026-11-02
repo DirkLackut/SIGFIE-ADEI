@@ -12,14 +12,24 @@ export async function abrirGrupo(rpc: Rpc, d: DatosGrupo) {
   return error ? { estado: "error" as const, ...traducirError(error) } : data!;
 }
 
+/** 002·CE-54, CE-55: un antecedente en la misma ruta de niveles. */
+export type Antecedente =
+  | { tipo: "reprobado"; codigo_grupo: string; nivel: string; nota_final: number }
+  | { tipo: "condicion_no_cumplida"; nivel: string; nivel_siguiente: string; nota_siguiente: number; nota_exigida: number };
+
 export type RespuestaInscripcion =
   | { estado: "inscrito"; id: string }
   | { estado: "ya_inscrito" }
+  | { estado: "antecedente"; antecedentes: Antecedente[] }
   | { estado: "superposicion"; grupos: { grupo_id: string; codigo_grupo: string }[] }
   | { estado: "error"; mensaje: string };
 
-export async function inscribir(rpc: Rpc, estudianteId: string, grupoId: string, confirmar = false): Promise<RespuestaInscripcion> {
-  const { data, error } = await rpc<RespuestaInscripcion>("inscribir", { p_estudiante: estudianteId, p_grupo: grupoId, p_confirmar: confirmar });
+/** Con antecedentes, la base pide un motivo (002·CE-54 a CE-56); con superposición,
+ *  confirmar (001·CE-84). */
+export async function inscribir(rpc: Rpc, estudianteId: string, grupoId: string, confirmar = false,
+                                motivo: string | null = null): Promise<RespuestaInscripcion> {
+  const { data, error } = await rpc<RespuestaInscripcion>("inscribir",
+    { p_estudiante: estudianteId, p_grupo: grupoId, p_confirmar: confirmar, p_motivo: motivo });
   return error ? { estado: "error", mensaje: traducirError(error).mensaje } : data!;
 }
 

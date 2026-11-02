@@ -9,6 +9,7 @@ import type { Rol } from "@/dominio/acceso";
 function enlacesPara(roles: Rol[]): EnlaceMenu[] {
   const tiene = (...r: Rol[]) => r.some((x) => roles.includes(x));
   const e: EnlaceMenu[] = [{ href: "/inicio", texto: "Inicio" }];
+  if (tiene("profesor")) e.push({ href: "/mis-grupos", texto: "Mis grupos" });
   if (tiene("asistente", "direccion")) e.push({ href: "/estudiantes", texto: "Estudiantes" }, { href: "/grupos", texto: "Grupos" });
   if (tiene("asistente")) e.push({ href: "/catalogos", texto: "Catálogos" }, { href: "/cuentas", texto: "Cuentas" });
   return e;

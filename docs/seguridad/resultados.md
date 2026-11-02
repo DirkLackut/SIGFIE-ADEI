@@ -252,3 +252,43 @@ formato.
 Las pruebas de este informe se corrieron con una copia local equivalente, levantada
 sin Docker en la máquina de pruebas de Claude. El camino con `supabase start` todavía
 no se ha probado en la PC del proyecto.
+
+## 10. Spec 002 · Captura académica (2026-11-02)
+
+La colección ganó la carpeta **«002 · Captura académica»** (25 peticiones). Se corrió la
+colección **completa** otra vez, con las migraciones 001 a 013, para comprobar también
+que la 002 no rompió nada de la 001.
+
+| | Resultado |
+|---|---|
+| **Newman, colección completa:** 103 peticiones y 152 comprobaciones | **0 fallos** |
+| **npm audit --omit=dev** | 0 vulnerabilidades |
+
+Qué prueba la carpeta 002, siempre por la API y sin pasar por la interfaz (CE-60):
+
+| Ataque | Respuesta |
+|---|---|
+| Un profesor pide el acta de un grupo que no es suyo | `denegado`, sin filas, y la denegación queda en la auditoría (CE-4) |
+| Un profesor guarda notas en un grupo ajeno, o en un acta ya entregada | 403 (CE-11, CE-47) |
+| Un profesor pone «Reprogramado» sin autorización, o autoriza él mismo una reprogramación | 400 y 403 (CE-35, Q1) |
+| Notas de 101, con decimales, con texto SQL o con una condición inventada | 400, con un mensaje propio y sin devolver la fila rechazada (CE-8, A05) |
+| La Asistente captura con el acta abierta | 403 (clarificación A3) |
+| Dirección guarda notas, condiciona, registra reglas o entrega un acta | 403 (CE-57) |
+| Se borra una regla ya confirmada | 400 (CE-28) |
+| Se escribe directo en las tablas `parcial` o `calificacion` | 401/403 o 0 filas (D26) |
+| Un profesor lee notas o resultados de un grupo ajeno; otra organización lee notas de ADEI | 0 filas (CE-58, CE-59) |
+| Otra organización pide un acta de ADEI | 404, sin trazas (CE-59) |
+| Sin sesión: «Mis grupos» o la regla de aprobación | 401 o 0 filas |
+
+**Hallazgo y corrección.** Una condición inventada («Aprobado por mí») llegaba hasta la
+restricción de la tabla, y su error devolvía la fila completa rechazada, con
+identificadores internos. Se corrigió en la propia migración 012, antes de aplicarla a
+producción: la función rechaza primero cualquier condición que no sea Registrado, No
+presentado, Justificado o Reprogramado, con un mensaje propio. Lo cubren la prueba
+`t20-operaciones-acta` y la comprobación «No devuelve la fila rechazada» de Newman.
+
+Evidencia: `informes/newman-002.html` (informe completo, sin tokens ni contraseñas) y
+`evidencia/newman-002-terminal.png` (salida de la terminal: carpeta 002 y totales).
+`preparar.mjs` ahora crea además, con datos sintéticos, un acta propia abierta, una
+entregada, una inscripción en un grupo ajeno, y deja las cuatro cuentas con la clave
+de la copia local.

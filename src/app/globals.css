@@ -105,6 +105,12 @@ h1, h2, h3 { text-wrap: balance; }
   background: var(--color-dorado-suave);
 }
 .campo-entrada:disabled { background: var(--color-papel-alt); color: var(--color-tinta-suave); }
+/* Casillas del acta (002): una nota de 3 cifras y su condición, lado a lado. Más
+   angostas que un campo normal; la altura táctil de 40 px se conserva. */
+.campo-entrada.campo-parcial { width: 3.25rem; padding-inline: 0.25rem; text-align: center; }
+.campo-entrada.campo-condicion { width: 4.75rem; padding-inline: 0.45rem 0.2rem; font-size: 0.875rem; }
+/* «Nota» es lo normal: se ve apagado para que resalten NP, J y R. */
+.campo-entrada.campo-condicion[data-normal] { color: var(--color-tinta-suave); }
 /* Datos traídos del sistema que no se editan aquí (por ejemplo, el tutor ya
    registrado): se ven distintos de un campo para escribir. */
 .campo-entrada[readonly] { background: var(--color-papel-alt); border-style: dashed; cursor: default; }
@@ -223,4 +229,16 @@ details[open] > .menu-flotante {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* -------------------------------------------------------------- Impresión --
+   Hoja de registro de notas (002·CE-50): carta vertical, una hoja por cada 20
+   renglones. El rojo de las reprobadas se imprime aunque el navegador ahorre tinta. */
+@media print {
+  @page { size: letter portrait; margin: 0; }
+  .no-imprimir { display: none !important; }
+  /* Exactamente una hoja carta por cada 20 renglones: nada se pasa a una hoja extra. */
+  .hoja { margin: 0 !important; border: 0 !important; min-height: 0 !important; height: 279mm; break-after: page; }
+  .hoja:last-of-type { break-after: auto; }
+  .text-reprobado { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
