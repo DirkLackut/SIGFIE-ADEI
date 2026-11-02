@@ -2,8 +2,8 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { accionAbrirGrupo, type EstadoNuevoGrupo } from "./acciones";
-import { Campo, Selector } from "@/componentes/campos";
-import { BotonEnviar, conservarSiFalla, useErroresVivos } from "@/componentes/ui-cliente";
+import { Selector } from "@/componentes/campos";
+import { BotonEnviar, conservarSiFalla, useErroresVivos, CampoFecha } from "@/componentes/ui-cliente";
 import { Alerta, BarraAcciones, claseBoton } from "@/componentes/ui";
 import { hora } from "@/dominio/formato";
 import { hoyEnManagua } from "@/dominio/edad";
@@ -56,10 +56,10 @@ export function FormularioGrupo({ cat }: { cat: Catalogo }) {
                   defaultValue={mod?.horarios.some((h) => h.id === v.horario_id) ? v.horario_id : ""}
                   disabled={!mod} vacio={mod ? "Seleccione…" : "Primero elija la modalidad"}
                   opciones={(mod?.horarios ?? []).map((h) => ({ valor: h.id, texto: `${hora(h.hora_inicio)} a ${hora(h.hora_fin)}` }))} />
-        <Campo nombre="fecha_inicio" etiqueta="Fecha de inicio" requerido type="date" defaultValue={v.fecha_inicio} error={e.fecha_inicio}
+        <CampoFecha nombre="fecha_inicio" etiqueta="Fecha de inicio" requerido defaultValue={v.fecha_inicio} error={e.fecha_inicio}
                min={limites.inicio.min} max={limites.inicio.max}
                ayuda="Puede ser anterior a hoy si el grupo ya empezó, hasta un año atrás." />
-        <Campo nombre="fecha_termino" etiqueta="Fecha de término" requerido type="date" defaultValue={v.fecha_termino} error={e.fecha_termino}
+        <CampoFecha nombre="fecha_termino" etiqueta="Fecha de término" requerido defaultValue={v.fecha_termino} error={e.fecha_termino}
                min={limites.termino.min} max={limites.termino.max}
                ayuda="Posterior al inicio, sin haber pasado, y a no más de un año del inicio." />
       </fieldset>

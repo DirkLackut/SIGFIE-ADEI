@@ -3,6 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import { claseBoton, type EstiloBoton, type TamanoBoton } from "./ui";
+import { Campo } from "./campos";
 
 /** Botón de envío que se desactiva y cambia de texto mientras se guarda: evita
  *  el doble clic que registraría dos veces lo mismo. */
@@ -90,5 +91,22 @@ export function CampoContrasena({ nombre, etiqueta, autoComplete, error, ayuda }
       {error && <p id={`${nombre}-error`} className="mt-1 flex gap-1.5 text-sm font-medium text-dorado-texto"><span aria-hidden>⚠</span>{error}</p>}
       {ayuda && !error && <p id={`${nombre}-ayuda`} className="mt-1 text-xs text-tinta-suave">{ayuda}</p>}
     </div>
+  );
+}
+
+/**
+ * Campo de fecha que avisa, al salir de él, si quedó a medias («30/01/aaaa»).
+ * El navegador muestra la fecha incompleta pero la envía vacía, así que sin este
+ * aviso la persona creía haberla escrito (hallazgo de la T16 de la spec 002, CE-37:
+ * «indicará el campo y la regla»). El error del servidor, si lo hay, manda.
+ */
+export function CampoFecha(props: React.ComponentProps<typeof Campo>) {
+  const [incompleta, setIncompleta] = useState(false);
+  const revisar = (ev: React.SyntheticEvent<HTMLInputElement>) => setIncompleta(ev.currentTarget.validity.badInput);
+  return (
+    <Campo {...props} type="date"
+      error={props.error ?? (incompleta ? "Fecha incompleta: escriba el día, el mes y el año (dd/mm/aaaa)." : undefined)}
+      onBlur={(ev) => { revisar(ev); props.onBlur?.(ev); }}
+      onChange={(ev) => { if (incompleta) revisar(ev); props.onChange?.(ev); }} />
   );
 }

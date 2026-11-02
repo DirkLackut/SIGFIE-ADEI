@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { accionRegistrar, accionCompletarCedula, buscarTutor, type EstadoRegistro } from "./acciones";
 import { Campo, Selector } from "@/componentes/campos";
-import { BotonEnviar, conservarSiFalla, useErroresVivos } from "@/componentes/ui-cliente";
+import { BotonEnviar, conservarSiFalla, useErroresVivos, CampoFecha } from "@/componentes/ui-cliente";
 import { Alerta, BarraAcciones, claseBoton } from "@/componentes/ui";
 import { edadMientrasSeEscribe, hoyEnManagua } from "@/dominio/edad";
 import { fecha, telefono as formatoTelefono } from "@/dominio/formato";
@@ -55,7 +55,7 @@ export function FormularioEstudiante({ sucursales }: { sucursales: { valor: stri
         <Campo nombre="cedula" etiqueta="Cédula" defaultValue={v.cedula} error={e.cedula} autoComplete="off"
                ayuda="Formato 001-150190-0012K. Si no tiene (por ejemplo, un niño), déjela en blanco." />
         <div>
-          <Campo nombre="fecha_nacimiento" etiqueta="Fecha de nacimiento" requerido type="date" max={hoy}
+          <CampoFecha nombre="fecha_nacimiento" etiqueta="Fecha de nacimiento" requerido max={hoy}
                  defaultValue={v.fecha_nacimiento} error={e.fecha_nacimiento}
                  onChange={(ev) => setNacimiento(ev.currentTarget.value)} />
           {edad !== null && !e.fecha_nacimiento && (
