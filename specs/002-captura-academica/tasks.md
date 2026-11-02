@@ -68,9 +68,24 @@ computadora de Dirk.
 > T14: colección completa 103 peticiones, 152 comprobaciones, 0 fallos. Un hallazgo
 > corregido en la 012: una condición inventada devolvía la fila rechazada
 > (`docs/seguridad/resultados.md` §10).
-- [ ] **T15 · PC** Rama `spec/002-captura-academica`, `npx supabase db push --linked`
+- [x] **T15 · PC** Rama `spec/002-captura-academica`, `npx supabase db push --linked`
   (012 y 013), `npm run tipos`, `npm run verificar:supabase`, Pull Request y despliegue.
-- [ ] **T16 · PC** Lista de comprobación manual de la spec (15 renglones), con evidencia.
+- [x] **T16 · PC** Lista de comprobación manual de la spec (15 renglones), con evidencia.
+
+> T16, hallazgo 1 (2026-11-02, Dirk): una fecha a medias («30/01/aaaa») se veía
+> escrita pero el navegador la enviaba vacía, sin aviso al salir del campo. Corregido
+> con `CampoFecha` (`src/componentes/ui-cliente.tsx`): al salir avisa «Fecha
+> incompleta» (001·CE-37). Se usa en nacimiento, inicio y término del grupo y
+> vigencia de la regla. Comprobado en la copia local.
+>
+> T15 (2026-11-02): 012 y 013 aplicadas en producción, tipos regenerados,
+> `verificar:supabase` en verde, PR #2 fusionado y desplegado en Vercel.
+>
+> T16 cerrado el 2026-11-02 en producción con cuentas y estudiantes PRUEBA: los 15
+> renglones pasan. Captura del acta de 10 estudiantes en 3 min 34 s (RNF-02, límite 10).
+> Evidencia en `evidencias/spec-002/pruebas-manuales/` (fuera del repo). Nota para el
+> manual de usuario: al imprimir, desmarcar «Encabezados y pies de página» en «Más
+> ajustes» del navegador; si no, el navegador agrega fecha, título y dirección web.
 
 ## Trazabilidad: criterios por tarea
 

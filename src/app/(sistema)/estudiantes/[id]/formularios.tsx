@@ -2,7 +2,7 @@
 import { useActionState } from "react";
 import { accionEditar, accionVincularTutor, accionDesvincularTutor, type EstadoEdicion, type EstadoTutor } from "./acciones";
 import { Campo, Selector } from "@/componentes/campos";
-import { BotonConfirmar, BotonEnviar, conservarSiFalla, useErroresVivos } from "@/componentes/ui-cliente";
+import { BotonConfirmar, BotonEnviar, conservarSiFalla, useErroresVivos, CampoFecha } from "@/componentes/ui-cliente";
 import { useConfirmarExito } from "@/componentes/movimiento";
 import { Alerta } from "@/componentes/ui";
 import { hoyEnManagua } from "@/dominio/edad";
@@ -26,7 +26,7 @@ export function FormularioEdicion({ est, sucursales }: { est: DatosExpediente; s
         <Campo nombre="nombres" etiqueta="Nombres" requerido defaultValue={val("nombres")} error={e.nombres} />
         <Campo nombre="apellidos" etiqueta="Apellidos" requerido defaultValue={val("apellidos")} error={e.apellidos} />
         <Campo nombre="cedula" etiqueta="Cédula" defaultValue={val("cedula")} error={e.cedula} ayuda="Formato 001-150190-0012K." />
-        <Campo nombre="fecha_nacimiento" etiqueta="Fecha de nacimiento" requerido type="date" max={hoyEnManagua(new Date())} defaultValue={val("fecha_nacimiento")} error={e.fecha_nacimiento} />
+        <CampoFecha nombre="fecha_nacimiento" etiqueta="Fecha de nacimiento" requerido max={hoyEnManagua(new Date())} defaultValue={val("fecha_nacimiento")} error={e.fecha_nacimiento} />
         <Campo nombre="telefono" etiqueta="Teléfono" inputMode="numeric" defaultValue={val("telefono")} error={e.telefono} ayuda="8 dígitos." />
         <Campo nombre="correo" etiqueta="Correo" type="email" defaultValue={val("correo")} error={e.correo} />
         <Campo nombre="direccion" etiqueta="Dirección" defaultValue={val("direccion")} error={e.direccion} />

@@ -2,7 +2,7 @@
 import { useActionState } from "react";
 import { accionEliminarRegla, accionGuardarRegla, type EstadoRegla } from "./acciones";
 import { Alerta } from "@/componentes/ui";
-import { BotonConfirmar, BotonEnviar, conservarSiFalla, useErroresVivos } from "@/componentes/ui-cliente";
+import { BotonConfirmar, BotonEnviar, conservarSiFalla, useErroresVivos, CampoFecha } from "@/componentes/ui-cliente";
 import { useConfirmarExito } from "@/componentes/movimiento";
 import { Campo, Selector } from "@/componentes/campos";
 import { PROGRAMAS } from "@/dominio/catalogos";
@@ -28,7 +28,7 @@ export function FormularioRegla({ valores, boton }: { valores?: ValoresRegla; bo
                   opciones={PROGRAMAS.map((p) => ({ valor: p, texto: p }))} />
         <Campo nombre="nivel_desde" etiqueta="Del nivel" requerido inputMode="numeric" error={e.nivel_desde} defaultValue={v?.nivel_desde} ayuda="Orden del nivel en su programa" />
         <Campo nombre="nivel_hasta" etiqueta="Al nivel" requerido inputMode="numeric" error={e.nivel_hasta} defaultValue={v?.nivel_hasta} ayuda="Incluido" />
-        <Campo nombre="vigente_desde" etiqueta="Vigente desde" requerido type="date" error={e.vigente_desde} defaultValue={v?.vigente_desde}
+        <CampoFecha nombre="vigente_desde" etiqueta="Vigente desde" requerido error={e.vigente_desde} defaultValue={v?.vigente_desde}
                ayuda="Se aplica a los grupos que inician desde esa fecha" />
         <Campo nombre="nota_minima" etiqueta="Aprueba con" requerido inputMode="numeric" error={e.nota_minima} defaultValue={v?.nota_minima} />
         <Campo nombre="condicionado_desde" etiqueta="Condicionado desde" inputMode="numeric" error={e.condicionado_desde} defaultValue={v?.condicionado_desde}

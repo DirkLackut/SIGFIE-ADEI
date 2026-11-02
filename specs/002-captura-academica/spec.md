@@ -1,6 +1,6 @@
 # Spec 002 — Captura académica
 
-**Estado:** aprobada (2026-11-02, Dirk: «comienza entonces») · clarificación cerrada
+**Estado:** terminada (2026-11-02): aprobada por Dirk («comienza entonces»), desplegada y con la lista de comprobación manual completa · clarificación cerrada
 **Fecha:** 2026-11-01
 **Requisitos del SRS que cubre:** RF-04, RF-05, RF-06, RF-07, RF-08 ·
 RN-03, RN-04, RN-05, RN-10, RN-11, RN-12, RN-15, RN-24 · RF-15 (auditoría de lo nuevo) ·
@@ -277,21 +277,21 @@ de cada regla (74, 75, 79, 80, 89, 90) y un grupo iniciado antes de 2023.
 
 | # | Qué hacer | Qué debe pasar | CE | Verificado |
 |---|---|---|---|---|
-| 1 | Entrar como profesor desde un teléfono (360 px) | Ve solo sus grupos, sin desplazamiento horizontal | CE-1, RNF-06 | ☐ |
-| 2 | Pegar en la barra de direcciones el enlace del acta de otro profesor | Acceso negado | CE-4 | ☐ |
-| 3 | Capturar el acta completa de un grupo de 10 estudiantes | Se termina en menos de 10 minutos | RNF-02 | ☐ |
-| 4 | Escribir 769 en un parcial | Se rechaza con la regla, sin borrar lo demás | CE-8 | ☐ |
-| 5 | Dejar un parcial sin condición | La nota aparece como Provisional y dice qué falta | CE-16 | ☐ |
-| 6 | Registrar 85, 90 y un Justificado | Nota final 88 | CE-14, CE-17 | ☐ |
-| 7 | Registrar 76 en un grupo de Intermediate | Reprobado, en rojo | CE-19, CE-22 | ☐ |
-| 8 | Como Asistente, condicionar una nota de 78 en Intermediate y luego intentarlo con una de 70 | La primera se acepta con justificación; la segunda se rechaza | CE-29, CE-30 | ☐ |
-| 9 | Autorizar una reprogramación como Asistente y anotar la nota como profesor | El parcial queda Reprogramado y su nota sustituye al 0 | CE-32, CE-34 | ☐ |
-| 10 | Marcar como profesor que un estudiante dejó de asistir y decidir como Asistente una baja por inasistencia | Faltantes en 0 y estado Reprobado | CE-37, CE-39 | ☐ |
-| 11 | Intentar entregar con un parcial sin condición | Se rechaza y lista lo que falta | CE-43 | ☐ |
-| 12 | Entregar el acta y tratar de cambiar una nota como profesor | No se puede | CE-45, CE-47 | ☐ |
-| 13 | Imprimir el acta entregada | Formato oficial, reprobadas en rojo, fecha y hora de entrega | CE-50 a CE-53 | ☐ |
-| 14 | Inscribir a un reprobado en el nivel siguiente | Advertencia y motivo obligatorio | CE-54 | ☐ |
-| 15 | Revisar qué datos del estudiante ve el profesor | Solo nombre, apellidos y código | CE-5 | ☐ |
+| 1 | Entrar como profesor desde un teléfono (360 px) | Ve solo sus grupos, sin desplazamiento horizontal | CE-1, RNF-06 || ☑ 2026-11-02 |
+| 2 | Pegar en la barra de direcciones el enlace del acta de otro profesor | Acceso negado | CE-4 || ☑ 2026-11-02 |
+| 3 | Capturar el acta completa de un grupo de 10 estudiantes | Se termina en menos de 10 minutos | RNF-02 || ☑ 2026-11-02 |
+| 4 | Escribir 769 en un parcial | Se rechaza con la regla, sin borrar lo demás | CE-8 || ☑ 2026-11-02 |
+| 5 | Dejar un parcial sin condición | La nota aparece como Provisional y dice qué falta | CE-16 || ☑ 2026-11-02 |
+| 6 | Registrar 85, 90 y un Justificado | Nota final 88 | CE-14, CE-17 || ☑ 2026-11-02 |
+| 7 | Registrar 76 en un grupo de Intermediate | Reprobado, en rojo | CE-19, CE-22 || ☑ 2026-11-02 |
+| 8 | Como Asistente, condicionar una nota de 78 en Intermediate y luego intentarlo con una de 70 | La primera se acepta con justificación; la segunda se rechaza | CE-29, CE-30 || ☑ 2026-11-02 |
+| 9 | Autorizar una reprogramación como Asistente y anotar la nota como profesor | El parcial queda Reprogramado y su nota sustituye al 0 | CE-32, CE-34 || ☑ 2026-11-02 |
+| 10 | Marcar como profesor que un estudiante dejó de asistir y decidir como Asistente una baja por inasistencia | Faltantes en 0 y estado Reprobado | CE-37, CE-39 || ☑ 2026-11-02 |
+| 11 | Intentar entregar con un parcial sin condición | Se rechaza y lista lo que falta | CE-43 || ☑ 2026-11-02 |
+| 12 | Entregar el acta y tratar de cambiar una nota como profesor | No se puede | CE-45, CE-47 || ☑ 2026-11-02 |
+| 13 | Imprimir el acta entregada | Formato oficial, reprobadas en rojo, fecha y hora de entrega | CE-50 a CE-53 || ☑ 2026-11-02 |
+| 14 | Inscribir a un reprobado en el nivel siguiente | Advertencia y motivo obligatorio | CE-54 || ☑ 2026-11-02 |
+| 15 | Revisar qué datos del estudiante ve el profesor | Solo nombre, apellidos y código | CE-5 || ☑ 2026-11-02 |
 
 ## Impacto en el documento del curso
 
