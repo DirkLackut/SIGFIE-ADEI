@@ -112,9 +112,9 @@ computadora de Dirk.
 > monto negativo o moneda inventada devolvía la fila rechazada con identificadores
 > internos; ahora la función revisa cada campo antes y responde con el mensaje de la
 > regla (pruebas primero en `t24-facturas` y `errores.test.ts`). `docs/seguridad/resultados.md` §11.
-- [ ] **T22 · PC** Rama `spec/003-consulta-y-reportes`, `npx supabase db push --linked`
+- [x] **T22 · PC** Rama `spec/003-consulta-y-reportes`, `npx supabase db push --linked`
   (014), `npm run tipos`, `npm run verificar:supabase`, Pull Request y despliegue.
-- [ ] **T23 · PC** Lista de comprobación manual de la spec (17 renglones), con evidencia.
+- [x] **T23 · PC** Lista de comprobación manual de la spec (17 renglones), con evidencia.
 
 > T23 (2026-11-03, en producción, capturas hechas por Claude en el navegador integrado; Dirk
 > inició sesión en cada cuenta). Evidencia en `evidencias\spec-003\pruebas-manuales\` con su
@@ -128,7 +128,7 @@ computadora de Dirk.
 ## Bloque E — Correcciones de T23
 
 - [x] **T24 · Aquí** Hallazgos 1 a 3, pruebas primero.
-- [ ] **T25 · PC** Rama `fix/003-t23`, Pull Request y despliegue; volver a comprobar en
+- [x] **T25 · PC** Rama `fix/003-t23`, Pull Request y despliegue; volver a comprobar en
   producción los renglones 6 y 7, el historial impreso y «Copiar».
 
 > T24 (2026-11-03). Hallazgo 1: `/tmp/claude-0/e2e/impresos-003.cjs` imprime a PDF en la
@@ -165,3 +165,13 @@ computadora de Dirk.
 | CE-81 a CE-88 | T5, T9, T17 |
 | CE-89 a CE-94 | T5, T9, T18 |
 | CE-95 a CE-98 | T19, T11, T13, T20, T21 |
+
+> T22 (2026-11-03): PR #4 (`74c7ba9`), 014 aplicada con `db push`, tipos en su propio commit,
+> `verificar:supabase` en orden. En la PC las pruebas corren en dos pasadas: `t28` sola (con
+> las demás a la vez compite por el procesador y pasa los 2 s); 816 en verde.
+> T25 (2026-11-03): PR #5 (`a475b7c`) y PR #6 (`d6ce587`). Vuelto a comprobar en producción:
+> listado impreso en carta horizontal, con las 12 filas y dentro del margen; historial en una
+> hoja horizontal; la negación de prueba.ana quedó en la bitácora una sola vez; «Copiar»
+> responde «Copiada ✓». **Spec 003 cerrada.**
+> Después del cierre: `npm test` deja fuera la prueba de rendimiento, que se corre aparte con
+> `npm run test:rendimiento` (sola, sin competir con las demás por el procesador; ver T22).
