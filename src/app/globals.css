@@ -241,4 +241,7 @@ details[open] > .menu-flotante {
   .hoja { margin: 0 !important; border: 0 !important; min-height: 0 !important; height: 279mm; break-after: page; }
   .hoja:last-of-type { break-after: auto; }
   .text-reprobado { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  /* Spec 003, plan §5c: el listado y el historial van en carta horizontal. */
+  .hoja-horizontal { page: horizontal; height: 215.9mm; }
 }
+@page horizontal { size: letter landscape; margin: 0; }

@@ -86,6 +86,14 @@ const inscPropia = await inscribirEn(grupoPropio), inscAjena = await inscribirEn
 for (const n of [1, 2, 3]) await q("insert into parcial (organizacion_id, inscripcion_id, numero, condicion, valor) values ($1,$2,$3,'Registrado',85)", [adei.id, inscEntregada, n]);
 await q("update grupo set estado_acta = 'Entregada', fecha_entrega_acta = now() where id = $1", [grupoEntregado]);
 const [reglaConfirmada] = await q("select id from regla_aprobacion where organizacion_id = $1 and not provisional limit 1", [adei.id]);
+// Spec 003: una factura de ADEI (para ver que otra organización no la toca) y la
+// sucursal de la otra organización (para el reporte). Sintéticas.
+let [facturaAdei] = await q("select id from factura where organizacion_id = $1 and serie = 'B' and numero = 9001", [adei.id]);
+if (!facturaAdei) {
+  [facturaAdei] = await q("insert into factura (organizacion_id, serie, numero, fecha_emision, monto, moneda) values ($1,'B',9001,current_date,50,'USD') returning id", [adei.id]);
+  await q("insert into factura_estudiante (organizacion_id, factura_id, estudiante_id) values ($1,$2,$3)", [adei.id, facturaAdei.id, estAdei.id]);
+}
+const [sucursalOtra] = await q("select id from sucursal where organizacion_id = $1", [otra.id]);
 const valores = {
   app: "http://127.0.0.1:3000", api: env.NEXT_PUBLIC_SUPABASE_URL.replace("localhost", "127.0.0.1"), anon: env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   correo_asistente: await correo("aura.gomez"), correo_profesor: await correo("carla.mena"), correo_otra: await correo("otra.asistente"), correo_direccion: await correo("diana.direccion"), grupo_ajeno: grupoAjeno.id,
@@ -93,6 +101,7 @@ const valores = {
   service_key_fragmento: env.SUPABASE_SERVICE_ROLE_KEY.split(".")[2].slice(0, 20),
   grupo_propio_002: grupoPropio, grupo_ajeno_002: grupoAjeno002, insc_propia: inscPropia, insc_ajena: inscAjena,
   insc_entregada: inscEntregada, regla_confirmada: reglaConfirmada.id,
+  factura_adei: facturaAdei.id, sucursal_otra: sucursalOtra.id,
 };
 fs.writeFileSync("entorno-local.json", JSON.stringify({
   name: "SIGFIE local (sintético)", values: Object.entries(valores).map(([key, value]) => ({ key, value, enabled: true })) }, null, 2));

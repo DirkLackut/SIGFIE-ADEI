@@ -72,6 +72,18 @@ describe("decidirRuta", () => {
     expect(puedeAbrir(["profesor"], "/reglas")).toBe(false);
   });
 
+  test("003·CE-18, CE-34, CE-51, CE-93 · las secciones de consulta y reportes, por rol", () => {
+    const abre = (roles: Rol[], ruta: string) => puedeAbrir(roles, ruta);
+    for (const ruta of ["/consultas", "/consultas/exportar", "/consultas/imprimir", "/panel-actas", "/reportes", "/estudiantes/abc/historial/imprimir"]) {
+      expect(abre(["asistente"], ruta), ruta).toBe(true);
+      expect(abre(["direccion"], ruta), ruta).toBe(true);
+      expect(abre(["profesor"], ruta), ruta).toBe(false);
+    }
+    expect([abre(["direccion"], "/bitacora"), abre(["asistente"], "/bitacora"), abre(["profesor"], "/bitacora")]).toEqual([true, false, false]);
+    expect([abre(["asistente"], "/respaldo"), abre(["direccion"], "/respaldo")]).toEqual([true, false]);
+    expect([abre(["asistente"], "/inscripciones/abc/matricula"), abre(["direccion"], "/inscripciones/abc/matricula")]).toEqual([true, false]);
+  });
+
   test("CE-2 · con varios roles se suman los permisos", () => {
     expect(puedeAbrir(["direccion", "profesor"], "/estudiantes/abc")).toBe(true);
     expect(puedeAbrir(["profesor"], "/estudiantes/abc")).toBe(false);

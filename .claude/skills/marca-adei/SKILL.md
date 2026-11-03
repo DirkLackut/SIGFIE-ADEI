@@ -79,7 +79,7 @@ Usa las skills `emil-design-eng` y `review-animations` para el detalle. Lo esenc
 - Con «reducir movimiento» del sistema no hay animación: ya está resuelto en
   globals.css y en `MotionConfig`.
 
-## Impresos (acta: spec 002; hoja de matrícula: spec 003)
+## Impresos (acta: spec 002; hoja de matrícula, listado e historial: spec 003)
 
 Fotos de referencia y decisiones en `docs/formatos/README.md`. El acta sigue el
 formato oficial **«Hoja de registro de notas»** de ADEI:
@@ -94,6 +94,20 @@ formato oficial **«Hoja de registro de notas»** de ADEI:
 
 Se imprime a color o en gris: el emblema funciona en los dos (versión «Gris» del
 manual). No se rediseña el formato: se reproduce.
+
+La **Hoja de matrícula** (003) también se reproduce, sin «Estado civil» ni «Padece de
+alguna enfermedad»; lo no registrado queda en blanco y lo registrado pero vacío dice
+«sin registro». El **listado del filtrado** y el **historial académico** no tienen
+formato en papel: usan el encabezado del acta, tabla numerada y «Hoja N de M»
+(`specs/003-consulta-y-reportes/plan.md` §5c).
+
+## Archivos de Excel (003)
+
+Detalle en `specs/003-consulta-y-reportes/plan.md` §5b. Lo esencial: encabezado de
+ADEI en marino, fecha, autor, criterios y total arriba; encabezado de columnas con
+fondo marino y letra blanca, fijo y con autofiltro; códigos como texto, fechas como
+fechas; rojo **solo** en notas reprobadas; letra Calibri (Montserrat casi nunca está
+instalada donde se abre el archivo); sin emblema.
 
 ## Revisión de calidad
 

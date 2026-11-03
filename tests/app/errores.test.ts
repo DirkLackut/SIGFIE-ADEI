@@ -20,6 +20,12 @@ describe("traducirError (CE-37)", () => {
   test("CE-23 · lo que está en uso no se elimina: se ofrece desactivar", () => {
     expect(traducirError({ code: "23503", message: 'update or delete on table "nivel" violates foreign key constraint' }).mensaje).toMatch(/desactivar/);
   });
+  test("T21 · el mensaje propio de una regla de la factura también indica su campo", () => {
+    expect(traducirError({ code: "23514", message: "El monto va de 0.01 a 9,999.99, con dos decimales como máximo." }))
+      .toEqual({ campo: "monto", mensaje: "El monto va de 0.01 a 9,999.99, con dos decimales como máximo." });
+    expect(traducirError({ code: "23514", message: "La fecha de emisión no es válida." }))
+      .toEqual({ campo: "fecha_emision", mensaje: "La fecha de emisión no es válida." });
+  });
   test("un error técnico desconocido no se muestra crudo", () => {
     expect(traducirError({ code: "22P02", message: 'invalid input syntax for type uuid: "abc"' }).mensaje).toMatch(/No se pudo guardar/);
   });

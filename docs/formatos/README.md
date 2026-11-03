@@ -28,16 +28,30 @@ principio 9; skill `marca-adei`).
 
 ## Hoja de matrícula (003)
 
+Se reproduce el formato: emblema arriba a la izquierda, «ACADEMIA DE ENSEÑANZA EN
+INGLES / HOJA DE MATRICULA», recuadro de foto arriba a la derecha y las tres
+secciones subrayadas (Datos del alumno, Datos del tutor, Datos de la academia).
+
 Se prellena con lo que el sistema registra: nombres, apellidos, fecha de
-nacimiento, edad, dirección, cédula, celular, correo, tutor, contacto de
-emergencia, fecha de ingreso, nivel, horario, inicio y término del nivel,
-profesor y curso.
+nacimiento, edad, dirección, cédula, celular, correo, tutor (nombre, celular y
+cédula), «En caso de emergencia llamar a», fecha de ingreso, nivel, horario,
+inicio y término del nivel, profesor, curso, «Inscrito por» y, de la factura
+asociada a la inscripción, «N.º Recibo» y «Paga».
 
 - **No se imprimen «Estado civil» ni «Padece de alguna enfermedad»**: el sistema no
   registra esos datos (aviso de privacidad, Ley 787, minimización de datos).
-- Lo que el sistema no registra (lugar donde vive, escolaridad, paga, requisitos
-  entregados, foto) queda como línea en blanco para llenarse a mano.
-- El N.º de recibo sale de la factura registrada (RF-17) cuando exista.
+- Un dato que el sistema guarda pero este estudiante no tiene dice «sin registro».
+- Lo que el sistema no registra para nadie (recuadro de foto, lugar donde vive,
+  nivel de escolaridad, requisitos entregados) queda como línea en blanco para
+  llenarse a mano.
+
+## Impresos sin formato en papel (003)
+
+El listado del filtrado y el historial académico no tienen un formato impreso en
+ADEI. Usan el encabezado del acta (emblema, «Academia de Enseñanza en Inglés»,
+título en mayúsculas), la tabla numerada y «Hoja N de M». El listado va en carta
+horizontal; el historial, en carta vertical. Detalle en
+`specs/003-consulta-y-reportes/plan.md` §5c.
 
 ## Factura contado
 

@@ -390,6 +390,130 @@ pm.test("Sin datos personales de más", () => pm.expect(pm.response.text()).to.n
   vacio("Sin sesión no se lee la regla de aprobación", "{{api}}/rest/v1/regla_aprobacion?select=id", "{{anon}}"),
 ], "Que la captura académica respete rol, grupo, estado del acta y organización aunque la petición no pase por la interfaz (CE-60).");
 
+// ---------------------------------------------------------------------------
+// 003 · Consulta y reportes (spec 003, CE-18, CE-33, CE-34, CE-66, CE-74, CE-93 a CE-95, CE-97)
+// ---------------------------------------------------------------------------
+const denegado = (nombre, f, tok, cuerpo = {}) => pet(nombre, "POST", rpc(f), {
+  headers: api(tok), body: json(cuerpo),
+  pruebas: `
+pm.test("Responde 200 con estado denegado y nada más", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: "denegado" }); });`,
+});
+const noExiste = (nombre, f, tok, cuerpo) => pet(nombre, "POST", rpc(f), {
+  headers: api(tok), body: json(cuerpo),
+  pruebas: `
+pm.test("Responde «no existe» (404)", () => pm.response.to.have.status(404));
+pm.test("No trae datos de ADEI ni trazas", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));`,
+});
+const invalido = (nombre, tok, criterios, vista = "inscripciones", destino = "pantalla", pagina = 1) => pet(nombre, "POST", rpc("filtrar"), {
+  headers: api(tok), body: json({ p_criterios: criterios, p_vista: vista, p_pagina: pagina, p_destino: destino }),
+  pruebas: `
+pm.test("No cae el servicio (sin 5xx)", () => pm.expect(pm.response.code).to.be.below(500));
+pm.test("Responde criterios_invalidos, sin filas", () => {
+  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql("criterios_invalidos"); pm.expect(r).to.not.have.property("filas"); }
+  else pm.expect(pm.response.code).to.be.within(400, 499);
+});`,
+});
+const sinCambio = (nombre, metodo, url, tok, cuerpo) => pet(nombre, metodo, url, {
+  headers: [...api(tok), { key: "Prefer", value: "return=representation" }], body: cuerpo ? json(cuerpo) : undefined,
+  pruebas: `pm.test("No cambia ninguna fila", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });`,
+});
+const factura = (extra = {}) => ({ serie: "B", numero: 9100, fecha_emision: "2026-10-01", monto: 40, moneda: "USD", forma_pago: "Efectivo", estudiantes: ["{{estudiante_adei}}"], ...extra });
+const c003 = carpeta("003 · Consulta y reportes", [
+  // El profesor no entra a nada de esta spec (CE-18).
+  denegado("Profesor: filtrar responde «denegado» (CE-18)", "filtrar", "{{tok_profesor}}", { p_criterios: {}, p_vista: "inscripciones", p_pagina: 1, p_destino: "pantalla" }),
+  denegado("Profesor: exportar responde «denegado» (CE-18)", "filtrar", "{{tok_profesor}}", { p_criterios: {}, p_vista: "estudiantes", p_pagina: 1, p_destino: "exportar" }),
+  denegado("Profesor: el historial responde «denegado» (CE-18)", "historial_academico", "{{tok_profesor}}", { p_estudiante: "{{estudiante_adei}}" }),
+  denegado("Profesor: la Hoja de matrícula responde «denegado»", "hoja_matricula", "{{tok_profesor}}", { p_inscripcion: "{{insc_propia}}" }),
+  denegado("Profesor: el panel de actas responde «denegado» (CE-18)", "panel_actas", "{{tok_profesor}}"),
+  denegado("Profesor: el reporte por sucursal responde «denegado» (CE-18)", "reporte_sucursales", "{{tok_profesor}}"),
+  denegado("Profesor: la bitácora responde «denegado» (CE-93)", "bitacora", "{{tok_profesor}}"),
+  denegado("Profesor: el respaldo responde «denegado» (CE-34)", "respaldo", "{{tok_profesor}}"),
+  // Cada rol, solo lo suyo.
+  denegado("Dirección: el respaldo responde «denegado» (CE-34)", "respaldo", "{{tok_direccion}}"),
+  denegado("Asistente: la bitácora responde «denegado» (CE-93)", "bitacora", "{{tok_asistente}}"),
+  rechazado("Dirección no registra facturas (CE-66)", "POST", rpc("registrar_factura"), "{{tok_direccion}}", { p_datos: factura(), p_confirmar: true }),
+  rechazado("Dirección no anula facturas (CE-66)", "POST", rpc("anular_factura"), "{{tok_direccion}}", { p_id: "{{factura_adei}}", p_motivo: "Intento de Dirección" }),
+  rechazado("Dirección no cambia el estado de matrícula (CE-74)", "POST", rpc("cambiar_estado_matricula"), "{{tok_direccion}}",
+    { p_estudiante: "{{estudiante_adei}}", p_estado: "Desertor", p_fecha: null, p_observacion: "Intento de Dirección", p_confirmar: true }),
+  rechazado("El profesor no registra facturas (CE-66)", "POST", rpc("registrar_factura"), "{{tok_profesor}}", { p_datos: factura(), p_confirmar: true }),
+  rechazado("Sin sesión no se filtra", "POST", rpc("filtrar"), "{{anon}}", { p_criterios: {}, p_vista: "inscripciones", p_pagina: 1, p_destino: "pantalla" }),
+  rechazado("Sin sesión no hay respaldo", "POST", rpc("respaldo"), "{{anon}}", {}),
+  // Otra organización: lo de ADEI «no existe» (CE-95, CE-97).
+  noExiste("Otra organización: el historial de un estudiante de ADEI no existe", "historial_academico", "{{tok_otra}}", { p_estudiante: "{{estudiante_adei}}" }),
+  noExiste("Otra organización: la Hoja de matrícula de ADEI no existe", "hoja_matricula", "{{tok_otra}}", { p_inscripcion: "{{insc_propia}}" }),
+  noExiste("Otra organización: no cambia el estado de un estudiante de ADEI", "cambiar_estado_matricula", "{{tok_otra}}",
+    { p_estudiante: "{{estudiante_adei}}", p_estado: "Desertor", p_fecha: null, p_observacion: "Intento ajeno", p_confirmar: true }),
+  noExiste("Otra organización: no anula una factura de ADEI", "anular_factura", "{{tok_otra}}", { p_id: "{{factura_adei}}", p_motivo: "Intento ajeno" }),
+  noExiste("Otra organización: no corrige una factura de ADEI", "corregir_factura", "{{tok_otra}}",
+    { p_id: "{{factura_adei}}", p_version: 1, p_datos: factura({ numero: 9001, monto: 1 }), p_motivo: "Intento ajeno", p_confirmar: true }),
+  noExiste("Otra organización: no ampara con su factura a un estudiante de ADEI", "registrar_factura", "{{tok_otra}}", { p_datos: factura(), p_confirmar: true }),
+  noExiste("Asistente de ADEI: el reporte de una sucursal ajena no existe", "reporte_sucursales", "{{tok_asistente}}", { p_sucursal: "{{sucursal_otra}}" }),
+  pet("Otra organización: filtrar sin criterios no trae a nadie de ADEI (CE-95)", "POST", rpc("filtrar"), {
+    headers: api("{{tok_otra}}"), body: json({ p_criterios: {}, p_vista: "estudiantes", p_pagina: 1, p_destino: "exportar" }),
+    pruebas: `
+pm.test("Responde ok", () => pm.expect(pm.response.json().estado).to.eql("ok"));
+pm.test("Ningún estudiante de ADEI", () => { pm.expect(pm.response.text()).to.not.include(pm.variables.get("estudiante_adei")); pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}-\\d{5}/); });`,
+  }),
+  pet("Otra organización: su respaldo no trae nada de ADEI (CE-33, CE-95)", "POST", rpc("respaldo"), {
+    headers: api("{{tok_otra}}"), body: json({}),
+    pruebas: `
+pm.test("Responde ok", () => pm.expect(pm.response.json().estado).to.eql("ok"));
+pm.test("Ningún dato de ADEI", () => { const t = pm.response.text(); pm.expect(t).to.not.include(pm.variables.get("estudiante_adei")); pm.expect(t).to.not.match(/ADEI-\\d{4}-\\d{5}|G-\\d{4}-\\d{4}/); });
+pm.test("Sin cuentas, contraseñas ni bitácora (CE-33)", () => pm.expect(pm.response.text()).to.not.match(/nombre_usuario|encrypted_password|"auditoria"|"bitacora"/i));`,
+  }),
+  // Criterios manipulados (A05, CE-1, CE-95).
+  invalido("Un criterio inventado se rechaza", "{{tok_asistente}}", { "cedula; drop table estudiante": "1" }),
+  invalido("Pedir por organización se rechaza (no es un criterio)", "{{tok_asistente}}", { organizacion_id: "{{org_otra}}" }),
+  invalido("Una sucursal de otra organización se rechaza (CE-95)", "{{tok_asistente}}", { sucursal_id: "{{sucursal_otra}}" }),
+  invalido("Texto con SQL en un catálogo se rechaza", "{{tok_asistente}}", { modalidad_id: "x' or 1=1 --" }),
+  invalido("Una vista inventada se rechaza", "{{tok_asistente}}", {}, "auditoria"),
+  invalido("Un destino inventado se rechaza", "{{tok_asistente}}", {}, "inscripciones", "todo"),
+  invalido("Los criterios como lista se rechazan", "{{tok_asistente}}", ["sucursal_id"]),
+  invalido("Una fecha imposible se rechaza", "{{tok_asistente}}", { desde: "2026-02-31" }),
+  pet("Una página negativa no rompe nada: devuelve la primera", "POST", rpc("filtrar"), {
+    headers: api("{{tok_asistente}}"), body: json({ p_criterios: {}, p_vista: "inscripciones", p_pagina: -5, p_destino: "pantalla" }),
+    pruebas: `pm.test("Responde ok", () => { pm.response.to.have.status(200); pm.expect(pm.response.json().estado).to.eql("ok"); });`,
+  }),
+  pet("Bitácora: un filtro inventado se rechaza", "POST", rpc("bitacora"), {
+    headers: api("{{tok_direccion}}"), body: json({ p_filtros: { tabla: "auth.users" }, p_pagina: 1 }),
+    pruebas: `pm.test("Responde criterios_invalidos", () => pm.expect(pm.response.json().estado).to.eql("criterios_invalidos"));`,
+  }),
+  pet("Bitácora: un tipo de acción con SQL se rechaza", "POST", rpc("bitacora"), {
+    headers: api("{{tok_direccion}}"), body: json({ p_filtros: { tipo_accion: "Consulta' or '1'='1" }, p_pagina: 1 }),
+    pruebas: `pm.test("Responde criterios_invalidos", () => pm.expect(pm.response.json().estado).to.eql("criterios_invalidos"));`,
+  }),
+  // Facturas: solo por las operaciones (D34) y con los límites de la base.
+  rechazado("Nadie escribe directo en la tabla factura (D34)", "POST", "{{api}}/rest/v1/factura", "{{tok_asistente}}",
+    { serie: "B", numero: 9200, fecha_emision: "2026-10-01", monto: 1, moneda: "USD" }),
+  sinCambio("Nadie cambia directo el monto de una factura (D34)", "PATCH", "{{api}}/rest/v1/factura?id=eq.{{factura_adei}}", "{{tok_asistente}}", { monto: 1 }),
+  sinCambio("Nadie borra directo quién ampara una factura (D34)", "DELETE", "{{api}}/rest/v1/factura_estudiante?factura_id=eq.{{factura_adei}}", "{{tok_asistente}}"),
+  sinCambio("El estado de matrícula no cambia directo sin fecha (principio 1)", "PATCH", "{{api}}/rest/v1/estudiante?id=eq.{{estudiante_adei}}", "{{tok_asistente}}", { estado_matricula: "Desertor" }),
+  rechazado("Un monto negativo se rechaza (CE-53)", "POST", rpc("registrar_factura"), "{{tok_asistente}}", { p_datos: factura({ monto: -10 }), p_confirmar: true }),
+  rechazado("Un número de factura con SQL se rechaza (A05)", "POST", rpc("registrar_factura"), "{{tok_asistente}}", { p_datos: factura({ numero: "1; delete from factura" }), p_confirmar: true }),
+  rechazado("Una moneda inventada se rechaza (CE-53)", "POST", rpc("registrar_factura"), "{{tok_asistente}}", { p_datos: factura({ moneda: "EUR" }), p_confirmar: true }),
+  rechazado("Una factura con fecha futura se rechaza (CE-53)", "POST", rpc("registrar_factura"), "{{tok_asistente}}", { p_datos: factura({ fecha_emision: "2099-01-01" }), p_confirmar: true }),
+  noExiste("Asistente de ADEI: no ampara a un estudiante de otra organización", "registrar_factura", "{{tok_asistente}}",
+    { p_datos: factura({ estudiantes: ["{{estudiante_otra}}"] }), p_confirmar: true }),
+  // Lo que ve Dirección viene enmascarado y las negaciones quedan registradas (A09, CE-94).
+  pet("Bitácora: ninguna cédula ni teléfono completos (CE-94)", "POST", rpc("bitacora"), {
+    headers: api("{{tok_direccion}}"), body: json({ p_filtros: {}, p_pagina: 1 }),
+    pruebas: `
+pm.test("Responde ok", () => pm.expect(pm.response.json().estado).to.eql("ok"));
+pm.test("Sin cédula completa", () => pm.expect(pm.response.text()).to.not.match(/\\d{3}-\\d{6}-\\d{4}[A-Z]/));
+pm.test("Sin teléfono completo", () => pm.expect(pm.response.text()).to.not.match(/[^\\d*]8\\d{7}[^\\d]/));`,
+  }),
+  pet("Las negaciones de esta carpeta quedaron en la bitácora (A09, CE-18, CE-34)", "POST", rpc("bitacora"), {
+    headers: api("{{tok_direccion}}"), body: json({ p_filtros: { tipo_accion: "Denegación" }, p_pagina: 1 }),
+    pruebas: `
+const r = pm.response.json();
+pm.test("Responde ok", () => pm.expect(r.estado).to.eql("ok"));
+const texto = JSON.stringify(r.filas || []);
+pm.test("Está la negación del respaldo", () => pm.expect(texto).to.include("respaldo"));
+pm.test("Está la negación del filtrado", () => pm.expect(texto).to.include("filtrado"));
+pm.test("Está la negación de la bitácora", () => pm.expect(texto).to.include("bitacora"));`,
+  }),
+], "Que filtrado, historial, Hoja de matrícula, facturas, estado de matrícula, panel, reporte, bitácora y respaldo respeten rol y organización aunque la petición no pase por la interfaz (CE-95).");
+
 const coleccion = {
   info: {
     name: "SIGFIE-ADEI · Pruebas de seguridad (OWASP Top 10:2025)",
@@ -410,7 +534,7 @@ const coleccion = {
       pruebas: `pm.test("La Asistente ve su sucursal central", () => pm.expect(pm.response.json()).to.have.lengthOf(1)); pm.collectionVariables.set("sucursal_adei", pm.response.json()[0].id);`,
     })],
     "Inicia sesión con cuatro cuentas sintéticas: Asistente, Profesor y Dirección de ADEI, y la Asistente de una organización ficticia."),
-    a01, a02, a04, a05, a07, a09, a10, c002],
+    a01, a02, a04, a05, a07, a09, a10, c002, c003],
 };
 fs.writeFileSync(process.argv[2] ?? "sigfie-seguridad.postman_collection.json", JSON.stringify(coleccion, null, 2));
 console.log("pruebas:", JSON.stringify(coleccion).match(/pm\.test\(/g).length);

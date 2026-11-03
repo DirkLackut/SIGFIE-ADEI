@@ -10,8 +10,10 @@ function enlacesPara(roles: Rol[]): EnlaceMenu[] {
   const tiene = (...r: Rol[]) => r.some((x) => roles.includes(x));
   const e: EnlaceMenu[] = [{ href: "/inicio", texto: "Inicio" }];
   if (tiene("profesor")) e.push({ href: "/mis-grupos", texto: "Mis grupos" });
-  if (tiene("asistente", "direccion")) e.push({ href: "/estudiantes", texto: "Estudiantes" }, { href: "/grupos", texto: "Grupos" });
-  if (tiene("asistente")) e.push({ href: "/catalogos", texto: "Catálogos" }, { href: "/cuentas", texto: "Cuentas" });
+  if (tiene("asistente", "direccion")) e.push({ href: "/estudiantes", texto: "Estudiantes" }, { href: "/grupos", texto: "Grupos" },
+    { href: "/consultas", texto: "Consultas" }, { href: "/panel-actas", texto: "Actas" }, { href: "/reportes", texto: "Reportes" });
+  if (tiene("direccion")) e.push({ href: "/bitacora", texto: "Bitácora" });
+  if (tiene("asistente")) e.push({ href: "/catalogos", texto: "Catálogos" }, { href: "/cuentas", texto: "Cuentas" }, { href: "/respaldo", texto: "Respaldo" });
   return e;
 }
 

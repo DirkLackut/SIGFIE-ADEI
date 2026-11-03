@@ -138,7 +138,7 @@ describe("inscribir (CE-54 a CE-57, CE-84, CE-93)", () => {
 
   test("CE-55 · un estudiante que no está Activo no se inscribe", async () => {
     const e = await estudiante();
-    await db.query("update estudiante set estado_matricula = 'Desertor', fecha_cambio_estado = now() where id = $1", [e]);
+    await db.query("update estudiante set estado_matricula = 'Desertor', fecha_cambio_estado = public.hoy_managua() where id = $1", [e]);
     await expect(inscribir(e, (await abrir()).id as string)).rejects.toThrow(/Activo/);
   });
 

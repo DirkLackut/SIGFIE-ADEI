@@ -327,6 +327,103 @@ export type Database = {
           },
         ]
       }
+      factura: {
+        Row: {
+          creado_en: string
+          fecha_emision: string
+          forma_pago: string
+          id: string
+          inscripcion_id: string | null
+          moneda: string
+          monto: number
+          numero: number
+          organizacion_id: string
+          serie: string
+          version: number
+        }
+        Insert: {
+          creado_en?: string
+          fecha_emision: string
+          forma_pago?: string
+          id?: string
+          inscripcion_id?: string | null
+          moneda: string
+          monto: number
+          numero: number
+          organizacion_id?: string
+          serie: string
+          version?: number
+        }
+        Update: {
+          creado_en?: string
+          fecha_emision?: string
+          forma_pago?: string
+          id?: string
+          inscripcion_id?: string | null
+          moneda?: string
+          monto?: number
+          numero?: number
+          organizacion_id?: string
+          serie?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "factura_organizacion_id_fkey"
+            columns: ["organizacion_id"]
+            isOneToOne: false
+            referencedRelation: "organizacion"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "factura_organizacion_id_inscripcion_id_fkey"
+            columns: ["organizacion_id", "inscripcion_id"]
+            isOneToOne: true
+            referencedRelation: "inscripcion"
+            referencedColumns: ["organizacion_id", "id"]
+          },
+          {
+            foreignKeyName: "factura_organizacion_id_inscripcion_id_fkey"
+            columns: ["organizacion_id", "inscripcion_id"]
+            isOneToOne: true
+            referencedRelation: "resultado_academico"
+            referencedColumns: ["organizacion_id", "inscripcion_id"]
+          },
+        ]
+      }
+      factura_estudiante: {
+        Row: {
+          estudiante_id: string
+          factura_id: string
+          organizacion_id: string
+        }
+        Insert: {
+          estudiante_id: string
+          factura_id: string
+          organizacion_id?: string
+        }
+        Update: {
+          estudiante_id?: string
+          factura_id?: string
+          organizacion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "factura_estudiante_organizacion_id_estudiante_id_fkey"
+            columns: ["organizacion_id", "estudiante_id"]
+            isOneToOne: false
+            referencedRelation: "estudiante"
+            referencedColumns: ["organizacion_id", "id"]
+          },
+          {
+            foreignKeyName: "factura_estudiante_organizacion_id_factura_id_fkey"
+            columns: ["organizacion_id", "factura_id"]
+            isOneToOne: false
+            referencedRelation: "factura"
+            referencedColumns: ["organizacion_id", "id"]
+          },
+        ]
+      }
       grupo: {
         Row: {
           codigo_grupo: string
@@ -960,6 +1057,10 @@ export type Database = {
         Args: { p_datos: Json; p_id: string; p_version: number }
         Returns: Json
       }
+      anular_factura: {
+        Args: { p_id: string; p_motivo: string }
+        Returns: undefined
+      }
       anular_inscripcion: {
         Args: { p_inscripcion: string; p_motivo: string }
         Returns: undefined
@@ -981,8 +1082,19 @@ export type Database = {
         Returns: Json
       }
       aviso_vigente: { Args: { p_organizacion: string }; Returns: string }
+      bitacora: { Args: { p_filtros?: Json; p_pagina?: number }; Returns: Json }
       buscar_estudiantes: {
         Args: { p_pagina?: number; p_texto: string }
+        Returns: Json
+      }
+      cambiar_estado_matricula: {
+        Args: {
+          p_confirmar?: boolean
+          p_estado: string
+          p_estudiante: string
+          p_fecha?: string
+          p_observacion?: string
+        }
         Returns: Json
       }
       cambiar_profesor: {
@@ -991,6 +1103,16 @@ export type Database = {
       }
       condicionar: {
         Args: { p_inscripcion: string; p_justificacion: string }
+        Returns: Json
+      }
+      corregir_factura: {
+        Args: {
+          p_confirmar?: boolean
+          p_datos: Json
+          p_id: string
+          p_motivo: string
+          p_version: number
+        }
         Returns: Json
       }
       crear_cuenta: {
@@ -1022,6 +1144,15 @@ export type Database = {
         Args: { p_confirmar?: boolean; p_grupo: string }
         Returns: Json
       }
+      filtrar: {
+        Args: {
+          p_criterios: Json
+          p_destino?: string
+          p_pagina?: number
+          p_vista?: string
+        }
+        Returns: Json
+      }
       guardar_parciales: {
         Args: {
           p_inscripcion: string
@@ -1032,6 +1163,8 @@ export type Database = {
         Returns: Json
       }
       guardar_regla: { Args: { p_datos: Json }; Returns: Json }
+      historial_academico: { Args: { p_estudiante: string }; Returns: Json }
+      hoja_matricula: { Args: { p_inscripcion: string }; Returns: Json }
       hoy_managua: { Args: never; Returns: string }
       inscribir: {
         Args: {
@@ -1047,6 +1180,10 @@ export type Database = {
       mi_profesor_id: { Args: never; Returns: string }
       mis_grupos: { Args: never; Returns: Json }
       normalizar: { Args: { texto: string }; Returns: string }
+      panel_actas: {
+        Args: { p_desde?: string; p_hasta?: string }
+        Returns: Json
+      }
       quitar_condicionado: {
         Args: { p_inscripcion: string; p_motivo: string }
         Returns: Json
@@ -1064,10 +1201,19 @@ export type Database = {
         }
         Returns: undefined
       }
+      registrar_factura: {
+        Args: { p_confirmar?: boolean; p_datos: Json }
+        Returns: Json
+      }
       registrar_ingreso_denegado: {
         Args: { p_detalle?: string; p_nombre_usuario: string }
         Returns: undefined
       }
+      reporte_sucursales: {
+        Args: { p_desde?: string; p_hasta?: string; p_sucursal?: string }
+        Returns: Json
+      }
+      respaldo: { Args: never; Returns: Json }
       siguiente_correlativo: {
         Args: { p_anio: number; p_organizacion: string; p_tipo: string }
         Returns: number

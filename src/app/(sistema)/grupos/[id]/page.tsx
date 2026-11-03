@@ -74,10 +74,15 @@ export default async function PaginaGrupo({ params, searchParams }: PageProps<"/
         {asistente && g.estado_acta !== "Abierta" && <div className="mb-4"><Alerta tipo="info">El acta fue entregada: no se pueden inscribir ni anular inscripciones.</Alerta></div>}
         <Tabla vacio="Este grupo todavía no tiene inscritos."
           columnas={[{ titulo: "N.º", ancho: "3rem", derecha: true }, { titulo: "Código ADEI", ancho: "10rem" }, { titulo: "Apellidos y nombres" },
-                     { titulo: "Inscrito el" }, { titulo: "Estado" }, ...(editable ? [{ titulo: "" }] : [])]}
+                     { titulo: "Inscrito el" }, { titulo: "Estado" }, ...(asistente ? [{ titulo: "Formatos" }] : []), ...(editable ? [{ titulo: "" }] : [])]}
           filas={filas.map((i, n) => [n + 1,
             <Link key="c" href={`/estudiantes/${i.estudiante.id}` as Route} className="font-mono font-semibold text-azul hover:underline">{i.estudiante.codigo_adei}</Link>,
             `${i.estudiante.apellidos}, ${i.estudiante.nombres}`, fecha(i.fecha_inscripcion), i.estado_inscripcion,
+            // 003·CE-44, CE-61: la Hoja de matrícula y la factura, con la inscripción ya elegida.
+            ...(asistente ? [<span key="f" className="flex flex-wrap gap-x-3 text-sm font-semibold whitespace-nowrap">
+              <Link href={`/inscripciones/${i.id}/matricula` as Route} className="text-azul hover:underline">Hoja de matrícula</Link>
+              <Link href={`/estudiantes/${i.estudiante.id}?factura=${i.id}#registrar-factura` as Route} className="text-azul hover:underline">Factura…</Link>
+            </span>] : []),
             ...(editable ? [<Anular key="a" grupoId={g.id} inscripcionId={i.id} />] : [])])} />
       </Seccion>
 

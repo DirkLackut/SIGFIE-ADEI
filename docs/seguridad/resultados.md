@@ -292,3 +292,46 @@ Evidencia: `informes/newman-002.html` (informe completo, sin tokens ni contrase�
 `preparar.mjs` ahora crea además, con datos sintéticos, un acta propia abierta, una
 entregada, una inscripción en un grupo ajeno, y deja las cuatro cuentas con la clave
 de la copia local.
+
+## 11. Spec 003 · Consulta y reportes (2026-11-02)
+
+La colección ganó la carpeta **«003 · Consulta y reportes»** (47 peticiones). Se corrió la
+colección **completa** otra vez, con las migraciones 001 a 014, para comprobar también
+que la 003 no rompió nada de la 001 ni de la 002.
+
+| | Resultado |
+|---|---|
+| **Newman, colección completa:** 150 peticiones y 234 comprobaciones | **0 fallos** |
+| **npm audit --omit=dev** | 0 vulnerabilidades |
+
+Qué prueba la carpeta 003, siempre por la API y sin pasar por la interfaz (CE-95):
+
+| Ataque | Respuesta |
+|---|---|
+| Un profesor filtra, exporta, pide un historial, una Hoja de matrícula, el panel de actas, el reporte, la bitácora o el respaldo | `denegado`, sin datos (CE-18) |
+| Dirección pide el respaldo; la Asistente pide la bitácora | `denegado` (CE-34, CE-93) |
+| Dirección o un profesor registran o anulan una factura, o cambian el estado de matrícula | 403 (CE-66, CE-74) |
+| Sin sesión: filtrar o pedir el respaldo | 401 |
+| Otra organización pide el historial, la Hoja de matrícula, el estado o una factura de ADEI, o ampara con su factura a un estudiante de ADEI | 404, sin trazas ni datos (CE-95, CE-97) |
+| La Asistente de ADEI pide el reporte de una sucursal ajena | 404 |
+| Otra organización filtra sin criterios o genera su respaldo | Solo sus datos; ninguno de ADEI, y el respaldo sin cuentas ni bitácora (CE-33) |
+| Criterios manipulados: uno inventado, por organización, una sucursal ajena, texto SQL en un catálogo, una vista o un destino inventados, criterios como lista, una fecha imposible | `criterios_invalidos`, sin filas y sin 5xx |
+| La bitácora con un filtro inventado o un tipo de acción con SQL | `criterios_invalidos` |
+| Se escribe directo en `factura` o `factura_estudiante`, o se cambia el estado de matrícula sin fecha | 403 o 400 (D34, principio 1) |
+| Facturas con monto negativo, número con SQL, moneda inventada o fecha futura | 400, con un mensaje propio (CE-53) |
+| Lo que lee Dirección en la bitácora | Sin cédulas ni teléfonos completos (CE-94) |
+| Las negaciones de la carpeta | Quedan en la bitácora: respaldo, filtrado y bitácora (A09) |
+
+**Hallazgo y corrección.** Igual que en la 002: una factura con monto negativo o con una
+moneda inventada llegaba hasta la restricción de la tabla, y su error devolvía la fila
+completa rechazada, con identificadores internos. Se corrigió en la propia migración 014,
+antes de aplicarla a producción: la función revisa primero la serie, el número, el monto,
+la moneda, la forma de pago y la fecha, y responde con el mismo mensaje de la regla y su
+nombre. La pantalla reconoce ese mensaje y lo pone junto a su campo. Lo cubren las pruebas
+`t24-facturas` y `errores.test.ts` (escritas primero y vistas fallar) y, en Newman, la
+comprobación de que ninguna respuesta devuelve «Failing row».
+
+Evidencia: `informes/newman-003.html` (informe completo, sin tokens ni contraseñas) y
+`evidencia/newman-003-terminal.png` (salida de la terminal: carpeta 003 y totales).
+`preparar.mjs` ahora crea además, con datos sintéticos, una factura de ADEI para
+comprobar que otra organización no la toca.

@@ -3329,6 +3329,1967 @@
           ]
         }
       ]
+    },
+    {
+      "name": "003 · Consulta y reportes",
+      "description": "Que filtrado, historial, Hoja de matrícula, facturas, estado de matrícula, panel, reporte, bitácora y respaldo respeten rol y organización aunque la petición no pase por la interfaz (CE-95).",
+      "item": [
+        {
+          "name": "Profesor: filtrar responde «denegado» (CE-18)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{},\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor: exportar responde «denegado» (CE-18)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{},\"p_vista\":\"estudiantes\",\"p_pagina\":1,\"p_destino\":\"exportar\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor: el historial responde «denegado» (CE-18)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/historial_academico",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_estudiante\":\"{{estudiante_adei}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor: la Hoja de matrícula responde «denegado»",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/hoja_matricula",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor: el panel de actas responde «denegado» (CE-18)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/panel_actas",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor: el reporte por sucursal responde «denegado» (CE-18)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/reporte_sucursales",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor: la bitácora responde «denegado» (CE-93)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/bitacora",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profesor: el respaldo responde «denegado» (CE-34)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/respaldo",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección: el respaldo responde «denegado» (CE-34)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/respaldo",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente: la bitácora responde «denegado» (CE-93)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/bitacora",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde 200 con estado denegado y nada más\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.eql({ estado: \"denegado\" }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no registra facturas (CE-66)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"serie\":\"B\",\"numero\":9100,\"fecha_emision\":\"2026-10-01\",\"monto\":40,\"moneda\":\"USD\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_adei}}\"]},\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no anula facturas (CE-66)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/anular_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_id\":\"{{factura_adei}}\",\"p_motivo\":\"Intento de Dirección\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dirección no cambia el estado de matrícula (CE-74)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/cambiar_estado_matricula",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_estudiante\":\"{{estudiante_adei}}\",\"p_estado\":\"Desertor\",\"p_fecha\":null,\"p_observacion\":\"Intento de Dirección\",\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El profesor no registra facturas (CE-66)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_profesor}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"serie\":\"B\",\"numero\":9100,\"fecha_emision\":\"2026-10-01\",\"monto\":40,\"moneda\":\"USD\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_adei}}\"]},\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin sesión no se filtra",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{},\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin sesión no hay respaldo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{anon}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/respaldo",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: el historial de un estudiante de ADEI no existe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/historial_academico",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_estudiante\":\"{{estudiante_adei}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde «no existe» (404)\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No trae datos de ADEI ni trazas\", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: la Hoja de matrícula de ADEI no existe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/hoja_matricula",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_inscripcion\":\"{{insc_propia}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde «no existe» (404)\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No trae datos de ADEI ni trazas\", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: no cambia el estado de un estudiante de ADEI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/cambiar_estado_matricula",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_estudiante\":\"{{estudiante_adei}}\",\"p_estado\":\"Desertor\",\"p_fecha\":null,\"p_observacion\":\"Intento ajeno\",\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde «no existe» (404)\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No trae datos de ADEI ni trazas\", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: no anula una factura de ADEI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/anular_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_id\":\"{{factura_adei}}\",\"p_motivo\":\"Intento ajeno\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde «no existe» (404)\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No trae datos de ADEI ni trazas\", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: no corrige una factura de ADEI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/corregir_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_id\":\"{{factura_adei}}\",\"p_version\":1,\"p_datos\":{\"serie\":\"B\",\"numero\":9001,\"fecha_emision\":\"2026-10-01\",\"monto\":1,\"moneda\":\"USD\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_adei}}\"]},\"p_motivo\":\"Intento ajeno\",\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde «no existe» (404)\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No trae datos de ADEI ni trazas\", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: no ampara con su factura a un estudiante de ADEI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"serie\":\"B\",\"numero\":9100,\"fecha_emision\":\"2026-10-01\",\"monto\":40,\"moneda\":\"USD\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_adei}}\"]},\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde «no existe» (404)\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No trae datos de ADEI ni trazas\", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente de ADEI: el reporte de una sucursal ajena no existe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/reporte_sucursales",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_sucursal\":\"{{sucursal_otra}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde «no existe» (404)\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No trae datos de ADEI ni trazas\", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: filtrar sin criterios no trae a nadie de ADEI (CE-95)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{},\"p_vista\":\"estudiantes\",\"p_pagina\":1,\"p_destino\":\"exportar\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde ok\", () => pm.expect(pm.response.json().estado).to.eql(\"ok\"));",
+                  "pm.test(\"Ningún estudiante de ADEI\", () => { pm.expect(pm.response.text()).to.not.include(pm.variables.get(\"estudiante_adei\")); pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}-\\d{5}/); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otra organización: su respaldo no trae nada de ADEI (CE-33, CE-95)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_otra}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/respaldo",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde ok\", () => pm.expect(pm.response.json().estado).to.eql(\"ok\"));",
+                  "pm.test(\"Ningún dato de ADEI\", () => { const t = pm.response.text(); pm.expect(t).to.not.include(pm.variables.get(\"estudiante_adei\")); pm.expect(t).to.not.match(/ADEI-\\d{4}-\\d{5}|G-\\d{4}-\\d{4}/); });",
+                  "pm.test(\"Sin cuentas, contraseñas ni bitácora (CE-33)\", () => pm.expect(pm.response.text()).to.not.match(/nombre_usuario|encrypted_password|\"auditoria\"|\"bitacora\"/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un criterio inventado se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{\"cedula; drop table estudiante\":\"1\"},\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cae el servicio (sin 5xx)\", () => pm.expect(pm.response.code).to.be.below(500));",
+                  "pm.test(\"Responde criterios_invalidos, sin filas\", () => {",
+                  "  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql(\"criterios_invalidos\"); pm.expect(r).to.not.have.property(\"filas\"); }",
+                  "  else pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pedir por organización se rechaza (no es un criterio)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{\"organizacion_id\":\"{{org_otra}}\"},\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cae el servicio (sin 5xx)\", () => pm.expect(pm.response.code).to.be.below(500));",
+                  "pm.test(\"Responde criterios_invalidos, sin filas\", () => {",
+                  "  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql(\"criterios_invalidos\"); pm.expect(r).to.not.have.property(\"filas\"); }",
+                  "  else pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una sucursal de otra organización se rechaza (CE-95)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{\"sucursal_id\":\"{{sucursal_otra}}\"},\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cae el servicio (sin 5xx)\", () => pm.expect(pm.response.code).to.be.below(500));",
+                  "pm.test(\"Responde criterios_invalidos, sin filas\", () => {",
+                  "  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql(\"criterios_invalidos\"); pm.expect(r).to.not.have.property(\"filas\"); }",
+                  "  else pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Texto con SQL en un catálogo se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{\"modalidad_id\":\"x' or 1=1 --\"},\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cae el servicio (sin 5xx)\", () => pm.expect(pm.response.code).to.be.below(500));",
+                  "pm.test(\"Responde criterios_invalidos, sin filas\", () => {",
+                  "  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql(\"criterios_invalidos\"); pm.expect(r).to.not.have.property(\"filas\"); }",
+                  "  else pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una vista inventada se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{},\"p_vista\":\"auditoria\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cae el servicio (sin 5xx)\", () => pm.expect(pm.response.code).to.be.below(500));",
+                  "pm.test(\"Responde criterios_invalidos, sin filas\", () => {",
+                  "  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql(\"criterios_invalidos\"); pm.expect(r).to.not.have.property(\"filas\"); }",
+                  "  else pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un destino inventado se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{},\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"todo\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cae el servicio (sin 5xx)\", () => pm.expect(pm.response.code).to.be.below(500));",
+                  "pm.test(\"Responde criterios_invalidos, sin filas\", () => {",
+                  "  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql(\"criterios_invalidos\"); pm.expect(r).to.not.have.property(\"filas\"); }",
+                  "  else pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Los criterios como lista se rechazan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":[\"sucursal_id\"],\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cae el servicio (sin 5xx)\", () => pm.expect(pm.response.code).to.be.below(500));",
+                  "pm.test(\"Responde criterios_invalidos, sin filas\", () => {",
+                  "  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql(\"criterios_invalidos\"); pm.expect(r).to.not.have.property(\"filas\"); }",
+                  "  else pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una fecha imposible se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{\"desde\":\"2026-02-31\"},\"p_vista\":\"inscripciones\",\"p_pagina\":1,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cae el servicio (sin 5xx)\", () => pm.expect(pm.response.code).to.be.below(500));",
+                  "pm.test(\"Responde criterios_invalidos, sin filas\", () => {",
+                  "  if (pm.response.code === 200) { const r = pm.response.json(); pm.expect(r.estado).to.eql(\"criterios_invalidos\"); pm.expect(r).to.not.have.property(\"filas\"); }",
+                  "  else pm.expect(pm.response.code).to.be.within(400, 499);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una página negativa no rompe nada: devuelve la primera",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/filtrar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_criterios\":{},\"p_vista\":\"inscripciones\",\"p_pagina\":-5,\"p_destino\":\"pantalla\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde ok\", () => { pm.response.to.have.status(200); pm.expect(pm.response.json().estado).to.eql(\"ok\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bitácora: un filtro inventado se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/bitacora",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_filtros\":{\"tabla\":\"auth.users\"},\"p_pagina\":1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde criterios_invalidos\", () => pm.expect(pm.response.json().estado).to.eql(\"criterios_invalidos\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bitácora: un tipo de acción con SQL se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/bitacora",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_filtros\":{\"tipo_accion\":\"Consulta' or '1'='1\"},\"p_pagina\":1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde criterios_invalidos\", () => pm.expect(pm.response.json().estado).to.eql(\"criterios_invalidos\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nadie escribe directo en la tabla factura (D34)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"serie\":\"B\",\"numero\":9200,\"fecha_emision\":\"2026-10-01\",\"monto\":1,\"moneda\":\"USD\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nadie cambia directo el monto de una factura (D34)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "url": "{{api}}/rest/v1/factura?id=eq.{{factura_adei}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"monto\":1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cambia ninguna fila\", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nadie borra directo quién ampara una factura (D34)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "url": "{{api}}/rest/v1/factura_estudiante?factura_id=eq.{{factura_adei}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cambia ninguna fila\", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El estado de matrícula no cambia directo sin fecha (principio 1)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "url": "{{api}}/rest/v1/estudiante?id=eq.{{estudiante_adei}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado_matricula\":\"Desertor\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No cambia ninguna fila\", () => { if (pm.response.code === 200) pm.expect(pm.response.json()).to.be.empty; else pm.expect(pm.response.code).to.be.within(400, 499); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un monto negativo se rechaza (CE-53)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"serie\":\"B\",\"numero\":9100,\"fecha_emision\":\"2026-10-01\",\"monto\":-10,\"moneda\":\"USD\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_adei}}\"]},\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un número de factura con SQL se rechaza (A05)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"serie\":\"B\",\"numero\":\"1; delete from factura\",\"fecha_emision\":\"2026-10-01\",\"monto\":40,\"moneda\":\"USD\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_adei}}\"]},\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una moneda inventada se rechaza (CE-53)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"serie\":\"B\",\"numero\":9100,\"fecha_emision\":\"2026-10-01\",\"monto\":40,\"moneda\":\"EUR\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_adei}}\"]},\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una factura con fecha futura se rechaza (CE-53)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"serie\":\"B\",\"numero\":9100,\"fecha_emision\":\"2099-01-01\",\"monto\":40,\"moneda\":\"USD\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_adei}}\"]},\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"La base rechaza la operación\", () => pm.expect(pm.response.code).to.be.within(400, 499));",
+                  "console.log(\"respuesta:\", pm.response.code, pm.response.text().slice(0, 160));",
+                  "pm.test(\"No revela detalles internos (sin traza)\", () => pm.expect(pm.response.text()).to.not.match(/\\bat \\w+ \\(|node_modules|stack/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Asistente de ADEI: no ampara a un estudiante de otra organización",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_asistente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/registrar_factura",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_datos\":{\"serie\":\"B\",\"numero\":9100,\"fecha_emision\":\"2026-10-01\",\"monto\":40,\"moneda\":\"USD\",\"forma_pago\":\"Efectivo\",\"estudiantes\":[\"{{estudiante_otra}}\"]},\"p_confirmar\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde «no existe» (404)\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"No trae datos de ADEI ni trazas\", () => pm.expect(pm.response.text()).to.not.match(/ADEI-\\d{4}|codigo_adei|stack|node_modules/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bitácora: ninguna cédula ni teléfono completos (CE-94)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/bitacora",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_filtros\":{},\"p_pagina\":1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Responde ok\", () => pm.expect(pm.response.json().estado).to.eql(\"ok\"));",
+                  "pm.test(\"Sin cédula completa\", () => pm.expect(pm.response.text()).to.not.match(/\\d{3}-\\d{6}-\\d{4}[A-Z]/));",
+                  "pm.test(\"Sin teléfono completo\", () => pm.expect(pm.response.text()).to.not.match(/[^\\d*]8\\d{7}[^\\d]/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Las negaciones de esta carpeta quedaron en la bitácora (A09, CE-18, CE-34)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{anon}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tok_direccion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{api}}/rest/v1/rpc/bitacora",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"p_filtros\":{\"tipo_accion\":\"Denegación\"},\"p_pagina\":1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const r = pm.response.json();",
+                  "pm.test(\"Responde ok\", () => pm.expect(r.estado).to.eql(\"ok\"));",
+                  "const texto = JSON.stringify(r.filas || []);",
+                  "pm.test(\"Está la negación del respaldo\", () => pm.expect(texto).to.include(\"respaldo\"));",
+                  "pm.test(\"Está la negación del filtrado\", () => pm.expect(texto).to.include(\"filtrado\"));",
+                  "pm.test(\"Está la negación de la bitácora\", () => pm.expect(texto).to.include(\"bitacora\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
