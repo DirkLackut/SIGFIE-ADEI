@@ -335,3 +335,11 @@ Evidencia: `informes/newman-003.html` (informe completo, sin tokens ni contrase�
 `evidencia/newman-003-terminal.png` (salida de la terminal: carpeta 003 y totales).
 `preparar.mjs` ahora crea además, con datos sintéticos, una factura de ADEI para
 comprobar que otra organización no la toca.
+
+**Hallazgo en la lista manual (T23, A09).** En producción, un profesor que pegaba la
+dirección de una pantalla ajena (por ejemplo, una consulta compartida) volvía a Inicio con
+el aviso, pero la negación no quedaba en la bitácora: la base registra las negaciones de sus
+funciones, y la pantalla ni siquiera llegaba a llamarlas. Ahora `proxy.ts` registra una
+«Denegación» de «pantalla» con la ruta pedida cada vez que alguien abre una página que su
+rol no permite (las precargas de Next no cuentan). Lo cubren `acceso.test.ts` y el recorrido
+`negacion-003.cjs` en la copia local (spec 003, CE-18; 001·CE-46).

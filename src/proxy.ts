@@ -53,6 +53,16 @@ export async function proxy(request: NextRequest) {
   const decision = decidirRuta(estado, request.nextUrl.pathname);
   if (decision.tipo === "seguir") return respuesta;
 
+  // CE-18, 001·CE-46: una pantalla negada por rol queda en la bitácora (hallazgo 2 de T23).
+  // Solo cuenta abrir la página (una dirección pegada o escrita): Next quita al proxy la
+  // marca de sus precargas, y una precarga no la pidió nadie. El menú de cada rol no
+  // enlaza pantallas ajenas; lo que se pida por la API lo niega y registra la base.
+  const abrePagina = request.headers.get("sec-fetch-dest") === "document";
+  if (decision.denegada && abrePagina) {
+    await supabase.rpc("registrar_evento", { p_tipo: "Denegación", p_entidad: "pantalla", p_registro: decision.denegada.slice(0, 120),
+      p_detalle: "Sección no disponible para su rol" });
+  }
+
   const destino = NextResponse.redirect(new URL(decision.a, request.url));
   destino.headers.set("Content-Security-Policy", csp);
   respuesta.cookies.getAll().forEach((c) => destino.cookies.set(c));   // conserva la sesión renovada

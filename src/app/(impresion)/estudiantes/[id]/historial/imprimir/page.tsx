@@ -16,7 +16,8 @@ import { formatoMonto } from "@/dominio/factura";
 import { BotonImprimir } from "../../../../actas/[id]/imprimir/boton";
 
 export const metadata: Metadata = { title: "Historial académico · SIGFIE-ADEI" };
-const POR_HOJA = 18;
+// Niveles por hoja carta horizontal, con margen para filas de dos líneas (hallazgo 1 de T23).
+const POR_HOJA = 16;
 
 /** CE-43: el historial para imprimir (plan §5c), con el encabezado del acta. */
 export default async function PaginaImprimirHistorial({ params }: PageProps<"/estudiantes/[id]/historial/imprimir">) {
@@ -62,7 +63,7 @@ export default async function PaginaImprimirHistorial({ params }: PageProps<"/es
                     <tr key={i.id}>
                       <td className="cifra">{n * POR_HOJA + k + 1}</td><td className="font-mono">{i.codigo_grupo}</td><td>{i.nivel}</td>
                       <td className="whitespace-nowrap">{i.modalidad} {hora(i.hora_inicio)}</td><td>{i.profesor}</td><td>{i.sucursal}</td>
-                      <td>{fecha(i.fecha_inicio)}</td><td>{fecha(i.fecha_termino)}</td>
+                      <td className="fecha">{fecha(i.fecha_inicio)}</td><td className="fecha">{fecha(i.fecha_termino)}</td>
                       {[1, 2, 3].map((x) => <td key={x} className="cifra text-center">{celdaParcial(i.parciales.find((p) => p.numero === x))}</td>)}
                       <td className={`cifra text-center font-bold ${rep ? "text-reprobado" : ""}`}>{i.nota_final ?? ""}{i.estado_academico === "Condicionado" ? " C" : ""}</td>
                       <td className={rep ? "text-reprobado" : ""}>{estadoEnPalabras(i.estado_academico, i.provisional) || i.estado_inscripcion}</td>

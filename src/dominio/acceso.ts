@@ -26,7 +26,7 @@ export type EstadoAcceso =
 
 export type Decision =
   | { tipo: "seguir" }
-  | { tipo: "redirigir"; a: string };
+  | { tipo: "redirigir"; a: string; denegada?: string };   // denegada: la ruta que se negó por rol (CE-18)
 
 /** Pantallas que se ven sin sesión. */
 const PUBLICAS = ["/ingresar"];
@@ -89,6 +89,7 @@ export function decidirRuta(estado: EstadoAcceso | null, ruta: string): Decision
   // Con acceso: las pantallas previas y el ingreso ya no tienen sentido.
   if (publica || ruta === "/aviso" || ruta === "/") return { tipo: "redirigir", a: "/inicio" };
 
-  if (!puedeAbrir(estado.roles, ruta)) return { tipo: "redirigir", a: "/inicio?aviso=sin-permiso" };
+  // CE-18, 001·CE-46: la negación por rol se registra en la bitácora (proxy.ts).
+  if (!puedeAbrir(estado.roles, ruta)) return { tipo: "redirigir", a: "/inicio?aviso=sin-permiso", denegada: ruta };
   return { tipo: "seguir" };
 }

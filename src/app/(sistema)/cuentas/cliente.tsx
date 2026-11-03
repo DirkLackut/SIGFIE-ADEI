@@ -1,11 +1,12 @@
 "use client";
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { accionCrearCuenta, accionRestablecer, accionEstado, accionRoles, type EstadoCuenta } from "./acciones";
 import { Campo, Selector } from "@/componentes/campos";
 import { BotonConfirmar, BotonEnviar, conservarSiFalla, useErroresVivos } from "@/componentes/ui-cliente";
 import { Aparecer, Desplegable, useConfirmarExito } from "@/componentes/movimiento";
 import { Alerta, claseBoton } from "@/componentes/ui";
 import type { Rol } from "@/dominio/acceso";
+import { copiarTexto } from "@/dominio/portapapeles";
 
 type Op = { valor: string; texto: string };
 const ROLES: { rol: Rol; nombre: string; detalle: string }[] = [
@@ -16,17 +17,33 @@ const ROLES: { rol: Rol; nombre: string; detalle: string }[] = [
 
 /** CE-8: la temporal se muestra una sola vez, con lo que hay que hacer con ella. */
 function Temporal({ t }: { t: { usuario: string; clave: string } }) {
-  const [copiado, setCopiado] = useState(false);
+  const [copiado, setCopiado] = useState<"no" | "copiado" | "manual">("no");
+  const codigo = useRef<HTMLElement>(null);
+  // Selecciona la contraseña en pantalla: sirve para «copiar» y para copiarla a mano.
+  const seleccionar = () => {
+    const sel = window.getSelection(); if (!codigo.current || !sel) return false;
+    const r = document.createRange(); r.selectNodeContents(codigo.current); sel.removeAllRanges(); sel.addRange(r);
+    return true;
+  };
+  const copiar = async () => {
+    const escribir = navigator.clipboard?.writeText ? (x: string) => navigator.clipboard.writeText(x) : undefined;
+    // execCommand está en desuso, pero es el único respaldo cuando el portapapeles moderno está negado.
+    setCopiado(await copiarTexto(t.clave, { escribir, conSeleccion: () => seleccionar() && document.execCommand("copy") }));
+  };
   return (
     <div role="status" className="rounded-lg border-2 border-azul bg-marino-suave p-4">
       <p className="font-semibold">Contraseña temporal de «{t.usuario}»</p>
       <div className="mt-2 flex flex-wrap items-center gap-3">
-        <code className="rounded-md border border-borde bg-papel px-3 py-2 font-mono text-xl tracking-wider select-all">{t.clave}</code>
-        <button type="button" className={claseBoton("secundario")}
-                onClick={() => navigator.clipboard?.writeText(t.clave).then(() => setCopiado(true))}>
-          {copiado ? "Copiada ✓" : "Copiar"}
+        <code ref={codigo} className="rounded-md border border-borde bg-papel px-3 py-2 font-mono text-xl tracking-wider select-all">{t.clave}</code>
+        <button type="button" className={claseBoton("secundario")} onClick={copiar}>
+          {copiado === "copiado" ? "Copiada ✓" : "Copiar"}
         </button>
       </div>
+      {copiado === "manual" && (
+        <p className="mt-2 text-sm font-semibold text-dorado-texto" aria-live="polite">
+          Este navegador no dejó copiarla. Ya quedó seleccionada: cópiela con Ctrl+C (o anótela).
+        </p>
+      )}
       <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">
         <li><strong>Anótela ahora:</strong> no se vuelve a mostrar ni queda guardada en ningún lado.</li>
         <li>Entréguela en persona. Al ingresar, el sistema le pedirá elegir una propia.</li>

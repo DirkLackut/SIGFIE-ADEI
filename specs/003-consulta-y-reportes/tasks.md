@@ -116,6 +116,33 @@ computadora de Dirk.
   (014), `npm run tipos`, `npm run verificar:supabase`, Pull Request y despliegue.
 - [ ] **T23 · PC** Lista de comprobación manual de la spec (17 renglones), con evidencia.
 
+> T23 (2026-11-03, en producción, capturas hechas por Claude en el navegador integrado; Dirk
+> inició sesión en cada cuenta). Evidencia en `evidencias\spec-003\pruebas-manuales\` con su
+> `INDICE.md`. Los 17 renglones dieron lo esperado salvo el 6 (y el historial impreso):
+> **hallazgo 1**, el listado salía en carta vertical y cortado. Además: **hallazgo 2**, el
+> profesor que abre una pantalla ajena por su dirección no quedaba en la bitácora (CE-18,
+> también 001·CE-46; la base sí registra cuando se le pide por la API); **hallazgo 3**,
+> «Copiar» la contraseña temporal no hacía nada cuando el navegador negaba el portapapeles
+> (001·CE-8). Se corrigen en T24 y T25 y se vuelven a comprobar en producción.
+
+## Bloque E — Correcciones de T23
+
+- [x] **T24 · Aquí** Hallazgos 1 a 3, pruebas primero.
+- [ ] **T25 · PC** Rama `fix/003-t23`, Pull Request y despliegue; volver a comprobar en
+  producción los renglones 6 y 7, el historial impreso y «Copiar».
+
+> T24 (2026-11-03). Hallazgo 1: `/tmp/claude-0/e2e/impresos-003.cjs` imprime a PDF en la
+> copia local 59 inscripciones con nombres de 48 caracteres, 40 estudiantes y un historial de
+> 20 niveles; antes, 11 de 15 comprobaciones en rojo (carta vertical, filas fuera de la hoja,
+> una hoja vertical en blanco al final), después 15 de 15 (plan §5c). Hallazgo 2:
+> `decidirRuta` marca la negación por rol con la ruta (`acceso.test.ts`, visto fallar) y
+> `proxy.ts` la registra como «Denegación» de «pantalla» al abrir la página; las precargas de
+> Next no cuentan (`negacion-003.cjs`: 3 de 3). Hallazgo 3: `dominio/portapapeles.ts`
+> (`portapapeles.test.ts`, visto fallar): si el portapapeles se niega, copia con la selección,
+> y si tampoco puede deja la contraseña seleccionada y pide copiarla con Ctrl+C
+> (`copiar-003.cjs`: 3 de 3). 820 pruebas en verde, `tsc` y `eslint` limpios, recorrido
+> completo 46 de 46 sin errores del navegador.
+
 ## Trazabilidad: criterios por tarea
 
 | CE | Tareas |

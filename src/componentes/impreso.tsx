@@ -29,5 +29,6 @@ export function HojaImpresa({ titulo, numero, de, pie, horizontal = true, childr
   );
 }
 
-/** Estilos de la tabla de un impreso: bordes finos, encabezado marino. */
-export const TABLA_IMPRESA = "w-full border-collapse [&_th]:border [&_th]:border-tinta [&_th]:bg-marino-suave [&_th]:px-1 [&_th]:py-0.5 [&_th]:text-left [&_td]:border [&_td]:border-borde [&_td]:px-1 [&_td]:py-0.5";
+/** Estilos de la tabla de un impreso: bordes finos, encabezado marino. Los códigos y
+ *  las fechas no se parten (cada fila ocupa lo menos posible, hallazgo 1 de T23). */
+export const TABLA_IMPRESA = "w-full border-collapse text-[8pt] leading-tight [&_th]:border [&_th]:border-tinta [&_th]:bg-marino-suave [&_th]:px-1 [&_th]:py-0.5 [&_th]:text-left [&_th]:align-bottom [&_td]:border [&_td]:border-borde [&_td]:px-1 [&_td]:py-0.5 [&_td]:align-top [&_td.font-mono]:whitespace-nowrap [&_td.fecha]:whitespace-nowrap";
