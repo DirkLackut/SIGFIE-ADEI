@@ -257,23 +257,25 @@ conteos de cada una conocidos de antemano (CE-21).
 
 | # | Qué hacer | Qué debe pasar | CE | Verificado |
 |---|---|---|---|---|
-| 1 | Como Asistente, filtrar por sucursal + modalidad Sabatino + estado académico Reprobado | Solo aparecen esos, con el total; los horarios ofrecidos son solo los de Sabatino | CE-1, CE-6, CE-10, RNF-03 | ☐ |
-| 2 | Poner la fecha final antes que la inicial | Se rechaza indicando el criterio; los demás criterios siguen puestos | CE-7 | ☐ |
-| 3 | Cambiar a la vista Estudiantes con los mismos criterios | Un renglón por estudiante con la cantidad de inscripciones | CE-2, CE-15 | ☐ |
-| 4 | Filtrar algo sin coincidencias | «0 resultados» explícito | CE-13 | ☐ |
-| 5 | Exportar un resultado de más de una página y abrirlo en Excel | Todas las filas, las mismas columnas, los criterios arriba y las fechas como fechas | CE-24, CE-26, CE-30 | ☐ |
-| 6 | Imprimir el mismo resultado | Emblema, criterios, total y numeración continua | CE-29 | ☐ |
-| 7 | Copiar la dirección del filtrado y abrirla como profesor | Acceso negado | CE-18, CE-23 | ☐ |
-| 8 | Abrir el historial de un estudiante con un nivel reprobado y uno condicionado | Orden cronológico, reprobada en rojo, Condicionado con su justificación | CE-37, CE-38 | ☐ |
-| 9 | Imprimir la Hoja de matrícula de un menor con tutor | Formato de ADEI, datos llenos, «sin registro» donde falta, sin estado civil ni salud | CE-44 a CE-48 | ☐ |
-| 10 | Registrar una factura familiar de dos hermanos y asociarla a la inscripción de uno | Se ve en los dos expedientes; el número sale en la Hoja de matrícula de esa inscripción | CE-59 a CE-61, CE-45 | ☐ |
-| 11 | Registrar una factura de US$250 | Pide confirmar el monto atípico | CE-56 | ☐ |
-| 12 | Pasar a Desertor a un estudiante con una inscripción En curso y luego intentar inscribirlo | Advierte la inscripción; después la inscripción nueva se rechaza | CE-71, CE-72 | ☐ |
-| 13 | Abrir el panel de actas del mes | Por profesor, entregadas, pendientes y vencidas, con los totales | CE-75, CE-79 | ☐ |
-| 14 | Abrir el reporte por sucursal como Sub-directora y tocar la cifra de Desertores | Conteos por sucursal con barras; la cifra abre el filtrado correspondiente | CE-81, CE-87, CE-88 | ☐ |
-| 15 | Como Dirección, buscar en la bitácora el cambio de estado del punto 12 | Aparece con el estado anterior y el nuevo; la cédula sale enmascarada | CE-89 a CE-91, CE-94 | ☐ |
-| 16 | Como Asistente, generar el respaldo completo y abrirlo | Una hoja por conjunto, los totales en la primera, sin cuentas ni bitácora | CE-31 a CE-33 | ☐ |
-| 17 | Abrir el filtrado y el historial en un teléfono (360 px) | Sin desplazamiento horizontal de la página | CE-96 | ☐ |
+| 1 | Como Asistente, filtrar por sucursal + modalidad Sabatino + estado académico Reprobado | Solo aparecen esos, con el total; los horarios ofrecidos son solo los de Sabatino | CE-1, CE-6, CE-10, RNF-03 | ☑ 3-nov |
+| 2 | Poner la fecha final antes que la inicial | Se rechaza indicando el criterio; los demás criterios siguen puestos | CE-7 | ☑ 3-nov |
+| 3 | Cambiar a la vista Estudiantes con los mismos criterios | Un renglón por estudiante con la cantidad de inscripciones | CE-2, CE-15 | ☑ 3-nov |
+| 4 | Filtrar algo sin coincidencias | «0 resultados» explícito | CE-13 | ☑ 3-nov |
+| 5 | Exportar un resultado de más de una página y abrirlo en Excel | Todas las filas, las mismas columnas, los criterios arriba y las fechas como fechas | CE-24, CE-26, CE-30 | ☑ 3-nov |
+| 6 | Imprimir el mismo resultado | Emblema, criterios, total y numeración continua | CE-29 | ☑ 3-nov |
+| 7 | Copiar la dirección del filtrado y abrirla como profesor | Acceso negado | CE-18, CE-23 | ☑ 3-nov |
+| 8 | Abrir el historial de un estudiante con un nivel reprobado y uno condicionado | Orden cronológico, reprobada en rojo, Condicionado con su justificación | CE-37, CE-38 | ☑ 3-nov |
+| 9 | Imprimir la Hoja de matrícula de un menor con tutor | Formato de ADEI, datos llenos, «sin registro» donde falta, sin estado civil ni salud | CE-44 a CE-48 | ☑ 3-nov |
+| 10 | Registrar una factura familiar de dos hermanos y asociarla a la inscripción de uno | Se ve en los dos expedientes; el número sale en la Hoja de matrícula de esa inscripción | CE-59 a CE-61, CE-45 | ☑ 3-nov |
+| 11 | Registrar una factura de US$250 | Pide confirmar el monto atípico | CE-56 | ☑ 3-nov |
+| 12 | Pasar a Desertor a un estudiante con una inscripción En curso y luego intentar inscribirlo | Advierte la inscripción; después la inscripción nueva se rechaza | CE-71, CE-72 | ☑ 3-nov |
+| 13 | Abrir el panel de actas del mes | Por profesor, entregadas, pendientes y vencidas, con los totales | CE-75, CE-79 | ☑ 3-nov |
+| 14 | Abrir el reporte por sucursal como Sub-directora y tocar la cifra de Desertores | Conteos por sucursal con barras; la cifra abre el filtrado correspondiente | CE-81, CE-87, CE-88 | ☑ 3-nov |
+| 15 | Como Dirección, buscar en la bitácora el cambio de estado del punto 12 | Aparece con el estado anterior y el nuevo; la cédula sale enmascarada | CE-89 a CE-91, CE-94 | ☑ 3-nov |
+| 16 | Como Asistente, generar el respaldo completo y abrirlo | Una hoja por conjunto, los totales en la primera, sin cuentas ni bitácora | CE-31 a CE-33 | ☑ 3-nov |
+| 17 | Abrir el filtrado y el historial en un teléfono (360 px) | Sin desplazamiento horizontal de la página | CE-96 | ☑ 3-nov |
+
+Verificada en producción el 3-nov-2026 (evidencia: `evidencias\spec-003\pruebas-manuales\INDICE.md`, fuera del repositorio). El renglón 6 se aprobó tras las correcciones de los PR #5 y #6 (hallazgo 1); el 7, tras el #5 (hallazgo 2: la negación queda en la bitácora).
 
 ## Impacto en el documento del curso
 
