@@ -7,6 +7,8 @@ const estado = (cambios: Partial<Extract<EstadoAcceso, { cuenta: true }>> = {}):
 });
 const a = (destino: string) => ({ tipo: "redirigir", a: destino });
 const sigue = { tipo: "seguir" };
+// CE-18, 001·CE-46: la negación por rol lleva la ruta pedida, para dejarla en la bitácora.
+const negado = (ruta: string) => ({ tipo: "redirigir", a: "/inicio?aviso=sin-permiso", denegada: ruta });
 
 describe("decidirRuta", () => {
   test("sin sesión solo se abre el ingreso", () => {
@@ -46,11 +48,20 @@ describe("decidirRuta", () => {
 
   test("CE-46 · CE-61 · cada rol abre solo sus secciones", () => {
     const prof = estado({ roles: ["profesor"] }), dir = estado({ roles: ["direccion"] });
-    expect(decidirRuta(prof, "/estudiantes")).toEqual(a("/inicio?aviso=sin-permiso"));
+    expect(decidirRuta(prof, "/estudiantes")).toEqual(negado("/estudiantes"));
     expect(decidirRuta(dir, "/estudiantes")).toEqual(sigue);
-    expect(decidirRuta(dir, "/estudiantes/nuevo")).toEqual(a("/inicio?aviso=sin-permiso"));
-    expect(decidirRuta(dir, "/cuentas")).toEqual(a("/inicio?aviso=sin-permiso"));
+    expect(decidirRuta(dir, "/estudiantes/nuevo")).toEqual(negado("/estudiantes/nuevo"));
+    expect(decidirRuta(dir, "/cuentas")).toEqual(negado("/cuentas"));
     expect(decidirRuta(estado(), "/cuentas")).toEqual(sigue);
+  });
+
+  test("CE-18 · el profesor que abre una pantalla de la 003 queda negado con la ruta, para la bitácora (hallazgo 2 de T23)", () => {
+    const prof = estado({ roles: ["profesor"] });
+    for (const r of ["/consultas", "/consultas/imprimir", "/panel-actas", "/reportes", "/bitacora", "/respaldo"])
+      expect(decidirRuta(prof, r), r).toEqual(negado(r));
+    // Las demás redirecciones no son negaciones: no se registran.
+    expect(decidirRuta(null, "/consultas")).not.toHaveProperty("denegada");
+    expect(decidirRuta(estado({ aviso_aceptado: false }), "/consultas")).not.toHaveProperty("denegada");
   });
 
   test("002·CE-1 · «Mis grupos» es solo del profesor", () => {

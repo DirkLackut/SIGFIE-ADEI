@@ -15,7 +15,10 @@ import { fecha, hora } from "@/dominio/formato";
 import { BotonImprimir } from "../../actas/[id]/imprimir/boton";
 
 export const metadata: Metadata = { title: "Listado para imprimir · SIGFIE-ADEI" };
-const POR_HOJA = 24;
+// Filas por hoja carta horizontal, medidas con nombres de 48 caracteres (hallazgo 1 de
+// T23): una inscripción ocupa dos líneas (nombre y fechas), un estudiante una.
+const POR_HOJA = 16;
+const POR_HOJA_ESTUDIANTES = 24;
 
 /** CE-29: el resultado completo para imprimir, en carta horizontal, con la
  *  numeración continua entre hojas. La base registra la impresión (CE-28). */
@@ -50,8 +53,8 @@ export default async function PaginaImprimirListado({ searchParams }: PageProps<
         <HojaImpresa key={h} titulo={titulo} numero={h + 1} de={todas.length} pie={pie}>
           <p className="mb-2"><strong>Criterios:</strong> {criterios} · <strong>Total:</strong> {r.total.toLocaleString("en-US")}</p>
           <table className={TABLA_IMPRESA}>
-            <thead><tr><th>N.º</th><th>Código</th><th>Apellidos y nombres</th><th>Sucursal</th><th>Grupo</th><th>Nivel</th><th>Horario</th>
-              <th>Profesor</th><th>Inicio</th><th>Término</th><th>Inscripción</th><th>Final</th><th>Estado</th></tr></thead>
+            <thead><tr><th>N.º</th><th>Código</th><th className="min-w-[50mm]">Apellidos y nombres</th><th>Sucursal</th><th>Grupo</th><th>Nivel</th><th>Horario</th>
+              <th className="min-w-[28mm]">Profesor</th><th>Inicio / Término</th><th>Inscripción</th><th>Final</th><th>Estado</th></tr></thead>
             <tbody>
               {filas.map((f, i) => {
                 const rep = f.estado_academico === "Reprobado";
@@ -60,7 +63,7 @@ export default async function PaginaImprimirListado({ searchParams }: PageProps<
                     <td className="cifra">{h * POR_HOJA + i + 1}</td><td className="font-mono">{f.codigo_adei}</td>
                     <td>{f.apellidos}, {f.nombres}</td><td>{f.sucursal}</td><td className="font-mono">{f.codigo_grupo}</td><td>{f.nivel}</td>
                     <td className="whitespace-nowrap">{f.modalidad} {hora(f.hora_inicio)}</td><td>{f.profesor}</td>
-                    <td>{fecha(f.fecha_inicio)}</td><td>{fecha(f.fecha_termino)}</td><td>{f.estado_inscripcion}</td>
+                    <td className="fecha">{fecha(f.fecha_inicio)}<br />{fecha(f.fecha_termino)}</td><td>{f.estado_inscripcion}</td>
                     <td className={`cifra text-center font-bold ${rep ? "text-reprobado" : ""}`}>{f.nota_final ?? ""}</td>
                     <td className={rep ? "text-reprobado" : ""}>{estadoEnPalabras(f.estado_academico, f.provisional)}</td>
                   </tr>
@@ -69,7 +72,7 @@ export default async function PaginaImprimirListado({ searchParams }: PageProps<
             </tbody>
           </table>
         </HojaImpresa>
-      )) : paginar(r.filas, POR_HOJA).map((filas, h, todas) => (
+      )) : paginar(r.filas, POR_HOJA_ESTUDIANTES).map((filas, h, todas) => (
         <HojaImpresa key={h} titulo={titulo} numero={h + 1} de={todas.length} pie={pie}>
           <p className="mb-2"><strong>Criterios:</strong> {criterios} · <strong>Total:</strong> {r.total.toLocaleString("en-US")}</p>
           <table className={TABLA_IMPRESA}>
@@ -78,7 +81,7 @@ export default async function PaginaImprimirListado({ searchParams }: PageProps<
             <tbody>
               {filas.map((f, i) => (
                 <tr key={f.id}>
-                  <td className="cifra">{h * POR_HOJA + i + 1}</td><td className="font-mono">{f.codigo_adei}</td><td>{f.apellidos}, {f.nombres}</td>
+                  <td className="cifra">{h * POR_HOJA_ESTUDIANTES + i + 1}</td><td className="font-mono">{f.codigo_adei}</td><td>{f.apellidos}, {f.nombres}</td>
                   <td className="font-mono">{f.cedula ?? "—"}</td><td>{f.sucursal}</td><td>{f.estado_matricula}</td>
                   <td>{f.ultimo_nivel ?? "Sin niveles cursados"}</td><td className="cifra text-center">{f.inscripciones}</td>
                 </tr>

@@ -148,6 +148,14 @@ y anclas, para un archivo que se usa para analizar datos. Lo que se imprime en p
 | **Historial académico** | No hay formato en papel (el SRS lo llama «el formato que la organización nunca logró») | Mismo encabezado; datos del estudiante; tabla cronológica Grupo · Nivel · Horario · Profesor · Sucursal · Inicio · Término · I · II · III · Final · Estado · Factura. Carta **horizontal** (cambio en T12: con 14 columnas no cabía en vertical) |
 | Factura contado | Documento fiscal | No se reproduce (CE-64) |
 
+**Cambio en T23 (hallazgo 1, 3-nov).** En producción, Chrome imprimía el listado en carta
+vertical y cortaba las filas: no aplica la página con nombre (`@page horizontal`) a una caja
+con `overflow: hidden`, y lo que va después de la última hoja abría una hoja vertical en
+blanco. Ahora la página horizontal se pone al documento entero (`html:has(.hoja-horizontal)`),
+la tabla impresa va en 8 pt, los códigos y las fechas no se parten, Inicio y Término van en
+una columna, y las filas por hoja se midieron con nombres de 48 caracteres: **16
+inscripciones**, **24 estudiantes** y **16 niveles** del historial por hoja.
+
 ## 6. Riesgos
 
 | Riesgo | Mitigación |
