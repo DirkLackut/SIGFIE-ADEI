@@ -53,16 +53,17 @@ export default async function PaginaImprimirListado({ searchParams }: PageProps<
         <HojaImpresa key={h} titulo={titulo} numero={h + 1} de={todas.length} pie={pie}>
           <p className="mb-2"><strong>Criterios:</strong> {criterios} · <strong>Total:</strong> {r.total.toLocaleString("en-US")}</p>
           <table className={TABLA_IMPRESA}>
-            <thead><tr><th>N.º</th><th>Código</th><th className="min-w-[50mm]">Apellidos y nombres</th><th>Sucursal</th><th>Grupo</th><th>Nivel</th><th>Horario</th>
-              <th className="min-w-[28mm]">Profesor</th><th>Inicio / Término</th><th>Inscripción</th><th>Final</th><th>Estado</th></tr></thead>
+            <thead><tr><th>N.º</th><th>Código</th><th className="min-w-[42mm]">Apellidos y nombres</th><th>Sucursal</th><th className="min-w-[30mm]">Grupo y nivel</th>
+              <th className="min-w-[34mm]">Horario y profesor</th><th>Inicio / Término</th><th>Inscripción</th><th>Final</th><th>Estado</th></tr></thead>
             <tbody>
               {filas.map((f, i) => {
                 const rep = f.estado_academico === "Reprobado";
                 return (
                   <tr key={f.id}>
                     <td className="cifra">{h * POR_HOJA + i + 1}</td><td className="font-mono">{f.codigo_adei}</td>
-                    <td>{f.apellidos}, {f.nombres}</td><td>{f.sucursal}</td><td className="font-mono">{f.codigo_grupo}</td><td>{f.nivel}</td>
-                    <td className="whitespace-nowrap">{f.modalidad} {hora(f.hora_inicio)}</td><td>{f.profesor}</td>
+                    <td>{f.apellidos}, {f.nombres}</td><td>{f.sucursal}</td>
+                    <td><span className="font-mono whitespace-nowrap">{f.codigo_grupo}</span><br />{f.nivel}</td>
+                    <td><span className="whitespace-nowrap">{f.modalidad} {hora(f.hora_inicio)}</span><br />{f.profesor}</td>
                     <td className="fecha">{fecha(f.fecha_inicio)}<br />{fecha(f.fecha_termino)}</td><td>{f.estado_inscripcion}</td>
                     <td className={`cifra text-center font-bold ${rep ? "text-reprobado" : ""}`}>{f.nota_final ?? ""}</td>
                     <td className={rep ? "text-reprobado" : ""}>{estadoEnPalabras(f.estado_academico, f.provisional)}</td>

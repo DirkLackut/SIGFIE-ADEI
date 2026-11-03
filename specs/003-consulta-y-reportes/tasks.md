@@ -142,6 +142,11 @@ computadora de Dirk.
 > y si tampoco puede deja la contraseña seleccionada y pide copiarla con Ctrl+C
 > (`copiar-003.cjs`: 3 de 3). 820 pruebas en verde, `tsc` y `eslint` limpios, recorrido
 > completo 46 de 46 sin errores del navegador.
+> Al recomprobar en producción (PR #5), la tabla del listado de inscripciones llegaba casi al
+> borde de la hoja, fuera del margen de 12 mm que las impresoras sí respetan. Se agregó a
+> `impresos-003.cjs` la comprobación «la tabla cabe entre los márgenes» (vista fallar) y el
+> listado junta «Grupo y nivel» y «Horario y profesor» en dos columnas: cada fila ocupa dos
+> líneas y caben las 16 por hoja (18 de 18 comprobaciones).
 
 ## Trazabilidad: criterios por tarea
 

@@ -153,7 +153,8 @@ vertical y cortaba las filas: no aplica la página con nombre (`@page horizontal
 con `overflow: hidden`, y lo que va después de la última hoja abría una hoja vertical en
 blanco. Ahora la página horizontal se pone al documento entero (`html:has(.hoja-horizontal)`),
 la tabla impresa va en 8 pt, los códigos y las fechas no se parten, Inicio y Término van en
-una columna, y las filas por hoja se midieron con nombres de 48 caracteres: **16
+una columna (y en el listado de inscripciones también «Grupo y nivel» y «Horario y
+profesor», para que la tabla quepa entre los márgenes), y las filas por hoja se midieron con nombres de 48 caracteres: **16
 inscripciones**, **24 estudiantes** y **16 niveles** del historial por hoja.
 
 ## 6. Riesgos
