@@ -34,6 +34,17 @@ const POR_RESTRICCION: Record<string, ErrorTraducido> = {
   usuario_nombre_formato:      { campo: "nombre_usuario", mensaje: "De 4 a 30 caracteres, sin espacios." },
   usuario_nombre_usuario_key:  { campo: "nombre_usuario", mensaje: "Ese nombre de usuario ya está en uso." },
   usuario_profesor_id_key:     { campo: "profesor_id", mensaje: "Ese profesor ya tiene una cuenta." },
+  // Spec 003: facturas (CE-53 a CE-55, CE-60) y estado de matrícula (CE-67).
+  factura_serie_formato:       { campo: "serie", mensaje: "La serie es una sola letra." },
+  factura_numero_rango:        { campo: "numero", mensaje: "El número es un entero de 1 a 5 cifras." },
+  factura_monto_rango:         { campo: "monto", mensaje: "El monto va de 0.01 a 9,999.99, con dos decimales como máximo." },
+  factura_moneda_valida:       { campo: "moneda", mensaje: "Elija US$ o C$." },
+  factura_forma_pago_valida:   { campo: "forma_pago", mensaje: "Elija Efectivo, Tarjeta o Transferencia." },
+  factura_fecha_cuatro_cifras: { campo: "fecha_emision", mensaje: "La fecha de emisión debe tener un año de cuatro cifras." },
+  factura_fecha_valida:        { campo: "fecha_emision", mensaje: "La fecha de emisión no es válida." },
+  factura_numero_unico:        { campo: "numero", mensaje: "Ya hay una factura con esa serie y ese número." },
+  factura_inscripcion_unica:   { campo: "inscripcion_id", mensaje: "Esa inscripción ya tiene una factura." },
+  estudiante_estado_matricula_check: { campo: "estado", mensaje: "Elija Activo, Desertor o Egresado." },
 };
 
 /** Lo que significa una regla de "check" sin nombre propio, por la columna. */
@@ -54,6 +65,10 @@ export function traducirError(e: ErrorBD): ErrorTraducido {
   const texto = `${e.message} ${e.details ?? ""}`;
   const restriccion = /constraint "([a-z_]+)"/.exec(texto)?.[1];
   if (restriccion && POR_RESTRICCION[restriccion]) return POR_RESTRICCION[restriccion];
+  // Las funciones revisan antes que la tabla y responden con el mismo mensaje de la
+  // regla (la API no trae el nombre de la restricción): se reconoce por el mensaje.
+  const porMensaje = Object.values(POR_RESTRICCION).find((r) => r.mensaje === e.message.trim());
+  if (porMensaje) return porMensaje;
   if (restriccion?.endsWith("_check")) {
     const col = Object.keys(POR_COLUMNA).find((c) => restriccion.endsWith(`_${c}_check`));
     if (col) return { campo: col, mensaje: POR_COLUMNA[col] };

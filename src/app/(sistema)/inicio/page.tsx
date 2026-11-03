@@ -44,11 +44,18 @@ export default async function PaginaInicio({ searchParams }: PageProps<"/inicio"
             <Tarea href="/grupos/nuevo" titulo="Abrir un grupo" texto="Nivel, horario, profesor y fechas, todo de las listas." />
             <Tarea href="/grupos" titulo="Inscribir en un grupo" texto="Abra el grupo y agregue a sus estudiantes." />
           </div>
+          <h2 className="pt-2 text-xs font-semibold tracking-wider text-tinta-suave uppercase">Consultas y reportes</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Tarea href="/consultas" titulo="Filtrar estudiantes" texto="Combine sucursal, nivel, horario, profesor, estado y fechas. Exporte a Excel o imprima." />
+            <Tarea href="/panel-actas" titulo="Entrega de actas" texto="Qué profesores entregaron y cuáles actas faltan o están vencidas." />
+            <Tarea href="/reportes" titulo="Reporte por sucursal" texto="Activos, desertores y egresados, y los movimientos del mes." />
+          </div>
           <h2 className="pt-2 text-xs font-semibold tracking-wider text-tinta-suave uppercase">Administración</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Tarea href="/catalogos" titulo="Catálogos" texto="Sucursales, modalidades y horarios, niveles y profesores." />
             <Tarea href="/cuentas" titulo="Cuentas de usuario" texto="Crear cuentas, asignar roles y restablecer contraseñas." />
             <Tarea href="/reglas" titulo="Regla de aprobación" texto="Nota mínima y Condicionado por programa y nivel." />
+            <Tarea href="/respaldo" titulo="Respaldo completo" texto="Descargue todos los datos en Excel para guardarlos fuera del sistema." />
           </div>
         </section>
       )}
@@ -58,6 +65,10 @@ export default async function PaginaInicio({ searchParams }: PageProps<"/inicio"
           <Tarea href="/estudiantes" titulo="Buscar un estudiante" texto="Consulta de expedientes. Solo lectura." />
           <Tarea href="/grupos" titulo="Ver los grupos" texto="Grupos abiertos, su profesor, sus inscritos y su acta." />
           <Tarea href="/reglas" titulo="Regla de aprobación" texto="Con qué nota se aprueba cada programa y nivel." />
+          <Tarea href="/consultas" titulo="Filtrar estudiantes" texto="Listados con su total, completos, para exportar o imprimir." />
+          <Tarea href="/panel-actas" titulo="Entrega de actas" texto="Qué profesores entregaron y cuáles actas faltan." />
+          <Tarea href="/reportes" titulo="Reporte por sucursal" texto="Activos, desertores y egresados, y cuántos dejaron de venir este mes." />
+          <Tarea href="/bitacora" titulo="Bitácora" texto="Quién consultó o cambió qué, y cuándo." />
         </div>
       )}
 

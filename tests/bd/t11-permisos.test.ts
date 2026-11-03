@@ -82,11 +82,13 @@ describe("reglas generales", () => {
          and has_function_privilege('authenticated', p.oid, 'execute') order by 1`);
     expect(r.rows.map((x) => x.f)).toEqual([
       "abrir_grupo", "acceso_habilitado", "aceptar_aviso", "acta_del_grupo", "actualizar_estudiante",
-      "anular_inscripcion", "asignar_roles", "autorizar_reprogramacion", "avisar_inasistencia",
-      "buscar_estudiantes", "cambiar_profesor", "condicionar", "crear_cuenta", "decidir_salida", "desvincular_tutor",
-      "edad", "eliminar_regla", "entregar_acta", "guardar_parciales", "guardar_regla",
+      "anular_factura", "anular_inscripcion", "asignar_roles", "autorizar_reprogramacion", "avisar_inasistencia",
+      "bitacora", "buscar_estudiantes", "cambiar_estado_matricula", "cambiar_profesor", "condicionar",
+      "corregir_factura", "crear_cuenta", "decidir_salida", "desvincular_tutor", "edad", "eliminar_regla",
+      "entregar_acta", "filtrar", "guardar_parciales", "guardar_regla", "historial_academico", "hoja_matricula",
       "hoy_managua", "inscribir", "mi_estado_acceso", "mi_organizacion", "mi_profesor_id", "mis_grupos",
-      "normalizar", "quitar_condicionado", "registrar_estudiante", "registrar_evento", "tiene_rol", "vincular_tutor",
+      "normalizar", "panel_actas", "quitar_condicionado", "registrar_estudiante", "registrar_evento",
+      "registrar_factura", "reporte_sucursales", "respaldo", "tiene_rol", "vincular_tutor",
     ]);
   });
 
@@ -94,9 +96,11 @@ describe("reglas generales", () => {
     const r = await db.query<{ f: string }>(
       `select p.proname f from pg_proc p where p.pronamespace = 'interno'::regnamespace order by 1`);
     expect(r.rows.map((x) => x.f)).toEqual([
-      "anotar_motivo", "antecedentes", "candidatos_mismo_estudiante", "contexto", "es_profesor_del_grupo",
-      "escapar_like", "estudiantes_que_coinciden", "exigir_acceso", "exigir_asistente", "exigir_motivo",
-      "posicion", "resultado", "resumen_acta", "ruta", "tocar",
+      "anotar_motivo", "antecedentes", "cambios", "candidatos_mismo_estudiante", "contexto", "desfase_completitud",
+      "enmascarar", "enmascarar_valor", "es_profesor_del_grupo", "escapar_like", "estudiantes_que_coinciden",
+      "exigir_acceso", "exigir_asistente", "exigir_motivo", "factura_json", "fecha_criterio",
+      "hay_criterio_de_inscripcion", "hoja", "inscripciones_que_cumplen", "monto_atipico", "periodo", "posicion",
+      "resultado", "resumen_acta", "revisar_criterios", "revisar_factura", "ruta", "tocar",
     ]);
     // Las de la 008 (sus operaciones corren con los permisos de quien llama) y, de
     // la 012, solo las que usan inscribir y la vista resultado_academico
